@@ -16,19 +16,13 @@ u8 gBatStateBuf[4] = {0,0,0,0};
 
 u16 gBatVoltArray[4]={0,0,0,0};
 
-u16 gTempVolt;
-
 u8 gChargeSkipCount[] = {0,0,0,0};    //控制PWM周期
 
 u16 preVoltData[4] ={0,0,0,0};
 
-u8 gAdcCount[4] = {0,0,0,0};
-
 
 u8 skipCount;
 u16 isPwmOn = 0;
-
-u8 idata gErrorCount[4] = 0;
 
 u8 dropCount[4] = {0,0,0,0};	
 u8 fitCount[4] = {0,0,0,0};
@@ -44,7 +38,7 @@ u8 idata gNowTwoBuf[2];
 
 
 
-
+u8 TotalTime[4] = {0,0,0,0};
 u8 gIsChargingBatPos=BT_1;
 u8 gChargingStatus = SYS_CHARGING_STATUS_DETECT;
 u8 gChargeChildStatus[4] = {0,0,0,0};
@@ -63,7 +57,7 @@ void FindTwoBattery()
 	{
 		for(batNum=BT_1; batNum<=BT_4;batNum++)
 		{
-			if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING && gBatVoltArray[batNum]> BAT_VOLT_NEAR_FULL)// CHARGE_STATE_ERROR | BAT_TYPE_ERROR | CHARGE_STATE_FULL
+			if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING && gBatVoltArray[batNum]>= BAT_START_FAST_CHARGE)// CHARGE_STATE_ERROR | BAT_TYPE_ERROR | CHARGE_STATE_FULL
 			{
 				gNowTwoBuf[fitNum] = batNum;  // 第几通道
 				fitNum++;
@@ -230,8 +224,6 @@ void PwmControl(unsigned char status)
 
 void removeBat(u8 batNum)
 {
-
-	gAdcCount[batNum] = 0;
 	gChargeSkipCount[batNum] = 0;
 	gChargingTimeTick[batNum] = 0;
 	gBatStateBuf[batNum] =STATE_DEAD_BATTERY;
@@ -240,7 +232,6 @@ void removeBat(u8 batNum)
 	preVoltData[batNum] = 0;
 	gIsFisrtChangeLevel[batNum] = 0;
 	gLastChangeLevelTick[batNum] = 0;
-	gErrorCount[batNum] = 0;
 	gNearFullTimeTick[batNum] = 0;
 	LED_OFF(batNum);
 	//PB &= 0xF0;   //close current pwm channel
@@ -256,7 +247,6 @@ void removeAllBat()
 
 	for(i=0;i<4;i++)
 	{
-	gAdcCount[i] = 0;
 	gChargeSkipCount[i] = 0;
 	gChargingTimeTick[i] = 0;
 	gBatStateBuf[i] =STATE_DEAD_BATTERY;
@@ -265,7 +255,6 @@ void removeAllBat()
 	preVoltData[i] = 0;
 	gIsFisrtChangeLevel[i] = 0;
 	gLastChangeLevelTick[i] = 0;
-	gErrorCount[i] = 0;
 	gNearFullTimeTick[i] = 0;
 	LED_OFF(i);
 	}
@@ -466,31 +455,17 @@ void FastCharge(u8 batNum)
 
 	if(gChargingTimeTick[batNum] > BAT_START_DV_COUNT)  //hod-off time, in this period, we do NOT detect -dv
 	{
-		if(gAdcCount[batNum] > 23 || preVoltData[batNum] > BAT_VOLT_CHANGE_FASTER)
+		tempV = getVbatAdc(batNum);
+		if(preVoltData[batNum])
 		{
-			gAdcCount[batNum]  = 0;
-			tempV = getVbatAdc(batNum);
-			if(preVoltData[batNum])
-			{
-				tempV = ((preVoltData[batNum]<<2) + tempV)/5;
-				preVoltData[batNum] = tempV;
-			}
-			else
-			{
-				preVoltData[batNum] = tempV;
-			}
+			tempV = ((preVoltData[batNum]<<2) + tempV)/5;
+			preVoltData[batNum] = tempV;
 		}
 		else
 		{
-			gAdcCount[batNum]++;
-			if(preVoltData[batNum] != 0)
-				tempV = preVoltData[batNum];
-			else
-			{
-				tempV = getVbatAdc(batNum);
-				preVoltData[batNum] = tempV;
-			}
+			preVoltData[batNum] = tempV;
 		}
+		
 		if(tempV > BAT_VOLT_NEAR_FULL)
 			gNearFullTimeTick[batNum]++;
 
@@ -569,11 +544,11 @@ void chargeHandler(void)
 	{
 		if(battery_state == STATE_DEAD_BATTERY)
 		{
-			chargingTime = CHARGING_TIME_30MS;
+			chargingTime = CHARGING_TIME_10MS;
 		}
 		else if(battery_state == STATE_BATTERY_DETECT)
 		{
-			chargingTime = CHARGING_TIME_1S;
+			chargingTime = CHARGING_TIME_500MS;
 		}
 		else if(battery_state == STATE_NORMAL_CHARGING)
 		{
@@ -581,7 +556,7 @@ void chargeHandler(void)
 		}
 		else if(battery_state == STATE_ZERO_BATTERY_TEMPERATURE_ERROR || battery_state == STATE_ZERO_BATTERY_CHARGE_ERROR)
 		{
-			chargingTime = CHARGING_TIME_30MS;
+			chargingTime = CHARGING_TIME_10MS;
 		}
 		else if(battery_state == STATE_BATTERY_TYPE_ERROR)
 		{
@@ -594,7 +569,7 @@ void chargeHandler(void)
 		else if(battery_state == STATE_BATTERY_FULL)
 		{
 
-			chargingTime = CHARGING_TIME_500MS;
+			chargingTime = CHARGING_TIME_0MS;
 		}
 		else
 			chargingTime =0;
@@ -678,6 +653,14 @@ void chargeHandler(void)
 				}
 				else if(battery_state == STATE_NORMAL_CHARGING)
 				{
+					tempV = getVbatAdc(gIsChargingBatPos);
+					if(tempV > BAT_ZERO_SPEC_VOLT)
+					{
+						StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
+						PwmControl(PWM_OFF);
+						gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+						return;
+					}
 					PwmControl(PWM_OFF);
 					gDelayCount++;
 					if(gDelayCount < 2)
@@ -699,6 +682,14 @@ void chargeHandler(void)
 				}
 				else if(battery_state == STATE_ZERO_BATTERY_TEMPERATURE_ERROR)
 				{
+					tempV = getVbatAdc(gIsChargingBatPos);
+					if(tempV > BAT_ZERO_SPEC_VOLT)
+					{
+						StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
+						PwmControl(PWM_OFF);
+						gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+						return;
+					}
 					PwmControl(PWM_OFF);
 					tempT = getBatTemp(gIsChargingBatPos);
 					if(tempT > ADC_TEMP_MAX && tempT < ADC_TEMP_MIN)
@@ -715,55 +706,67 @@ void chargeHandler(void)
 	}
 }
 
-
-u8 TotalTime[4] = {0,0,0,0};
 void PickBattery()
 {
-	u8 batNum;
+	u8 batNum,fitNum;
 
+
+	//	FindTwoBattery();
+	
 		if(gIsChargingBatPos >= BT_4)
 			gIsChargingBatPos = BT_1;
 		else
 			gIsChargingBatPos++;
+
 		if(gBatStateBuf[gIsChargingBatPos] == STATE_NORMAL_CHARGING)
 		{
+			if(gIsInTwoState)
+			{
+				while(gNowTwoBuf[0] != gIsChargingBatPos && gNowTwoBuf[1] != gIsChargingBatPos)
+				{
+					if(gIsChargingBatPos >= BT_4)
+						gIsChargingBatPos = BT_1;
+					else
+						gIsChargingBatPos++;
+				}
+			}
 			for(batNum = BT_1; batNum<=BT_4; batNum++)
 			{
 				if(batNum == gIsChargingBatPos)
 					continue;
-				else
+				if(gIsInTwoState)
+				{
+					if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING)
+						continue;
+				}
+				//else
 				{
 					switch(gBatStateBuf[batNum])
 					{
 						case STATE_DEAD_BATTERY:
 						case STATE_ZERO_BATTERY_TEMPERATURE_ERROR:
-								TotalTime[batNum] = TotalTime[batNum]+5;
+								TotalTime[gIsChargingBatPos] = TotalTime[gIsChargingBatPos]+2;
 								break;
 						case STATE_NORMAL_CHARGING:
 						case STATE_BATTERY_DETECT:
-						case STATE_BATTERY_FULL:
-								TotalTime[batNum] = TotalTime[batNum]+50;
+								TotalTime[gIsChargingBatPos] = TotalTime[gIsChargingBatPos]+50;
 								break;
 						default:
 							break;
 					}
 				}
-				if(TotalTime[batNum] >= 50)
+				if(TotalTime[gIsChargingBatPos] >= 50)
 					break;
 			}
-			if(TotalTime[batNum] < 45)
+			if(TotalTime[gIsChargingBatPos] < 48)
 			{
-						if(P3 &(1<<5))
-							LED_ON(0);
-						else
-							LED_OFF(0);
 				if(gIsChargingBatPos >= BT_4)
 					gIsChargingBatPos = BT_1;
 				else
 					gIsChargingBatPos++;
 			}
 			else
-				TotalTime[batNum] = 0;
+				TotalTime[gIsChargingBatPos] = 1;
 		}
 }
 
@@ -943,7 +946,7 @@ void main()
 			ClrWdt();
 		}	//outputHandler();
 
-		//ledHandler();
+		ledHandler();
 
 		ClrWdt();
 		

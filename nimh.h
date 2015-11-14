@@ -47,7 +47,9 @@ typedef 	 unsigned long		u32;
 #define STATE_ZERO_BATTERY_CHARGE_ERROR				7
 
 #define CHARGING_TIME_0MS	0
-#define CHARGING_TIME_30MS	5
+#define CHARGING_TIME_10MS	1
+#define CHARGING_TIME_20MS	2
+#define CHARGING_TIME_30MS	3
 #define CHARGING_TIME_500MS	50
 #define CHARGING_TIME_1S		100
 
@@ -132,6 +134,8 @@ typedef 	 unsigned long		u32;
 
 #define VIN_5V_MINUM			951			// 4.6  (4.6/6/3.3*4096)
 #define BAT_VOLT_NEAR_FULL		1762			// 1.42  1.42/3.3*4096
+
+#define BAT_START_FAST_CHARGE		1750		// 1.41  1.41/3.3*4096
 
 #define BAT_REMOVE_VOLT		868
 
