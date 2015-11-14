@@ -51,7 +51,7 @@ typedef 	 unsigned long		u32;
 #define CHARGING_TIME_20MS	2
 #define CHARGING_TIME_30MS	3
 #define CHARGING_TIME_500MS	50
-#define CHARGING_TIME_1S		100
+//#define CHARGING_TIME_1S		100
 
 
 #define SYS_CHARGING_STATUS_DETECT	0

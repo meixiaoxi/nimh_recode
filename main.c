@@ -258,6 +258,7 @@ void removeBat(u8 batNum)
 	gIsFisrtChangeLevel[batNum] = 0;
 	gLastChangeLevelTick[batNum] = 0;
 	gNearFullTimeTick[batNum] = 0;
+	TotalTime[batNum] = 0;
 	LED_OFF(batNum);
 	//PB &= 0xF0;   //close current pwm channel
 	PwmControl(PWM_OFF);
@@ -282,6 +283,7 @@ void removeAllBat()
 	gLastChangeLevelTick[i] = 0;
 	gNearFullTimeTick[i] = 0;
 	LED_OFF(i);
+	TotalTime[i] = 0;
 	}
 
 	
@@ -303,17 +305,15 @@ void StatusCheck()
 		{
 			if(gSysStatus == SYS_CHARGING_STATE)
 			{
-				delay_ms(2);
 				if(gSysStatus != (GET_SYS_STATUS()))
 				{
-				//gLowCurrentCount = 0;
-				gSysStatus = SYS_DISCHARGE_STATE;
-				CHANGE_TO_OUTPUT();
-				gOutputStatus = OUTPUT_STATUS_WAIT;				
-				//remove all bat
-				removeAllBat();
-				gPreChargingBatPos =BT_NULL;
-				isFromOutput = 0;
+					gSysStatus = SYS_DISCHARGE_STATE;
+					CHANGE_TO_OUTPUT();
+					gOutputStatus = OUTPUT_STATUS_WAIT;				
+					//remove all bat
+					removeAllBat();
+					isFromOutput = 0;
+					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
 				}
 			}
 			else
@@ -946,21 +946,11 @@ void main()
 		gOutputStatus = OUTPUT_STATUS_WAIT;
 		CHANGE_TO_OUTPUT();
 	}
-		#if 1
-		LED_ON(1);
-		delay_ms(100);
-		LED_OFF(1);
-		delay_ms(100);
-		LED_ON(1);
-		delay_ms(100);
-		LED_OFF(1);
-		#endif
-		delay_ms(100);
-
+	
 	while(1)
 	{
 		shortTick =0;
-		//StatusCheck();
+		StatusCheck();
 		
 		if(gSysStatus == SYS_CHARGING_STATE)
 		{
