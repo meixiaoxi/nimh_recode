@@ -52,17 +52,42 @@ u8 gDetectRemovePos=0;
 void FindTwoBattery()
 {
 	u8 batNum,fitNum = 0;
-	u16 max=0;
+	u8 temp;
 	if(gIsInTwoState == 0)
 	{
 		for(batNum=BT_1; batNum<=BT_4;batNum++)
 		{
 			if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING && gBatVoltArray[batNum]>= BAT_START_FAST_CHARGE)// CHARGE_STATE_ERROR | BAT_TYPE_ERROR | CHARGE_STATE_FULL
 			{
-				gNowTwoBuf[fitNum] = batNum;  // 第几通道
-				fitNum++;
-				if(fitNum >1)
-					break;
+				if(fitNum == 2)
+				{
+					if(gBatVoltArray[batNum] > gBatVoltArray[gNowTwoBuf[1]])	
+					{
+						gNowTwoBuf[0] = gNowTwoBuf[1];
+						gNowTwoBuf[1] = batNum;
+					}
+					else if(gBatVoltArray[batNum] > gBatVoltArray[gNowTwoBuf[0]])
+					{
+						gNowTwoBuf[0] = batNum;
+					}
+				}
+				else
+				{
+					if(fitNum)
+					{
+						if(gBatVoltArray[batNum] < gBatVoltArray[gNowTwoBuf[0]])
+						{
+							temp = gNowTwoBuf[0];
+							gNowTwoBuf[0] = batNum;
+							gNowTwoBuf[1] = temp;
+						}
+						else
+							gNowTwoBuf[1] = batNum;
+					}
+					else
+						gNowTwoBuf[0] = batNum;
+					fitNum++;
+				}
 			}
 		}
 	}
@@ -426,7 +451,7 @@ void PreCharge(u8 batNum)
 		}
 		else
 		{ 
-			gBatVoltArray[batNum] = getVbatAdc(batNum);
+			gBatVoltArray[batNum] = getVbatWithNoMos(batNum);
 			if(gBatVoltArray[batNum] >= CHARGING_PRE_END_VOLT )
 			{				
 				gChargingTimeTick[batNum] = 0;
@@ -455,7 +480,7 @@ void FastCharge(u8 batNum)
 
 	if(gChargingTimeTick[batNum] > BAT_START_DV_COUNT)  //hod-off time, in this period, we do NOT detect -dv
 	{
-		tempV = getVbatAdc(batNum);
+		tempV = getVbatWithNoMos(batNum);
 		if(preVoltData[batNum])
 		{
 			tempV = ((preVoltData[batNum]<<2) + tempV)/5;
@@ -515,7 +540,7 @@ void FastCharge(u8 batNum)
 	}
 	else
 	{
-		tempV = getVbatAdc(batNum);
+		tempV = getVbatWithNoMos(batNum);
 		if(tempV > BAT_VOLT_NEAR_FULL)
 			gNearFullTimeTick[batNum]++;
 		gBatVoltArray[batNum] = tempV;
@@ -584,7 +609,7 @@ void chargeHandler(void)
 		}
 		else
 		{
-			tempV = getVbatAdc(gIsChargingBatPos);
+			tempV = getVbatWithNoMos(gIsChargingBatPos);
 			if(battery_state == STATE_BATTERY_TEMPERATURE_ERROR)
 			{
 				tempT = getBatTemp(gIsChargingBatPos);
@@ -617,9 +642,9 @@ void chargeHandler(void)
 				}
 				else if(battery_state == STATE_BATTERY_DETECT)
 				{
-					tempV = getVbatAdc(gIsChargingBatPos);
 					if(isPwmOn)
 					{
+						tempV = getVbatAdc(gIsChargingBatPos);
 						batteryDetect(gIsChargingBatPos,tempV);
 						if(gBatStateBuf[gIsChargingBatPos] == STATE_BATTERY_TYPE_ERROR)
 						{
@@ -632,6 +657,8 @@ void chargeHandler(void)
 						gDelayCount++;
 						if(gDelayCount >=3)
 						{
+							tempV = getVbatWithNoMos(gIsChargingBatPos);
+							gBatVoltArray[gIsChargingBatPos] = tempV;
 							StatusChange(gIsChargingBatPos, STATE_NORMAL_CHARGING);
 							if(tempV< CHARGING_PRE_END_VOLT )
 								gChargeChildStatus[gIsChargingBatPos] =  CHARGE_STATE_PRE;
@@ -711,7 +738,7 @@ void PickBattery()
 	u8 batNum,fitNum;
 
 
-	//	FindTwoBattery();
+		FindTwoBattery();
 	
 		if(gIsChargingBatPos >= BT_4)
 			gIsChargingBatPos = BT_1;
@@ -737,7 +764,10 @@ void PickBattery()
 				if(gIsInTwoState)
 				{
 					if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING)
-						continue;
+					{
+						if(batNum != gNowTwoBuf[0] && batNum != gNowTwoBuf[1])
+							continue;
+					}
 				}
 				//else
 				{
