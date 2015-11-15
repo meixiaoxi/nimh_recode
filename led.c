@@ -1,13 +1,10 @@
 #include "nimh.h"
 
 extern u8 gBatStateBuf[4];
-extern u8 gBatLeveL[4];
 extern u8 gSysStatus;
 extern u8 gOutputStatus;
 extern u16 gBatVoltArray[4];
-extern u32 idata gLastChangeLevelTick[4];
-extern u8 idata gIsFisrtChangeLevel[4];
-extern u32 shortTick;
+extern u8 idata gIsInTwoState;
 void LED_ON(u8 led)
 {
 	switch(led)
@@ -126,80 +123,65 @@ if(gSysStatus == SYS_CHARGING_STATE)
 }
 else
 {
-	#if 0
+
+	gIsInTwoState++;
+	
+	if(gBatStateBuf[0] ==0)
+	{
+		if(gIsInTwoState > 100)
+		{
+			LED_OFF(BT_1);LED_OFF(BT_2);LED_OFF(BT_3);LED_OFF(BT_4);
+			gBatStateBuf[0] = 1;
+			gIsInTwoState = 0;
+		}
+		else
+		{
+			LED_ON(BT_1);LED_ON(BT_2);LED_ON(BT_3);LED_ON(BT_4);
+		}
+		return;
+	}
+
+	#if 1
 	if(gOutputStatus == OUTPUT_STATUS_NORMAL)
 	{	
 		/*********
-		gIsFisrtChangeLevel[0]用于轮流闪开始的标志
-		gIsFisrtChangeLevel[1]用于放电状态下初始四个灯亮的结束标志
+		gIsFisrtChangeLevel[1]用于轮流闪开始的标志
 		gIsFisrtChangeLevel[2]用于表示当前处于亮灯状态的灯
 		gIsFisrtChangeLevel[3]用于轮流亮时亮/灭的标志
 
 		**********/
-		if(gIsFisrtChangeLevel[1])
-		{
-			if(gIsFisrtChangeLevel[0])
+			if(gBatStateBuf[1])
 			{
-				if(gIsFisrtChangeLevel[3])  //亮
+				if(gBatStateBuf[3])  //亮
 				{
-					if(getDiffTickFromNow(gLastChangeLevelTick[0]) > LED_DISPLAY_ON)
+					if(gIsInTwoState > 50)
 					{
-						LED_OFF(gIsFisrtChangeLevel[2]);
-						if(gIsFisrtChangeLevel[2] ==4)
-							gIsFisrtChangeLevel[2] =1;
+						LED_OFF(gBatStateBuf[2]);
+						if(gBatStateBuf[2] ==BT_4)
+							gBatStateBuf[2] =BT_1;
 						else
-							gIsFisrtChangeLevel[2]++;
-						gLastChangeLevelTick[0] = getSysTick();
-						gIsFisrtChangeLevel[3] = 0;
+							gBatStateBuf[2]++;
+						gIsInTwoState = 0;
+						gBatStateBuf[3] = 0;
 					}
 				}
 				else  //灭
 				{
-					if(getDiffTickFromNow(gLastChangeLevelTick[0]) > LED_DISPLAY_OFF)
+					if(gIsInTwoState > 200)
 					{
-						LED_ON(gIsFisrtChangeLevel[2]);
-						gLastChangeLevelTick[0] = getSysTick();
-						gIsFisrtChangeLevel[3] = 1;
+						LED_ON(gBatStateBuf[2]);
+						gBatStateBuf[3] = 1;
+						gIsInTwoState = 0;
 					}
 				}
 			}
 		      else //第一次
 		      {
-				gIsFisrtChangeLevel[0] = 1;
-				gIsFisrtChangeLevel[2] =1;
-				gIsFisrtChangeLevel[3] = 1;
-				LED_ON(1);
-				gLastChangeLevelTick[0] = getSysTick();
+				gBatStateBuf[1] = 1;
+				gBatStateBuf[2] =1;
+				gBatStateBuf[3] = 1;
+				LED_ON(BT_1);
 			}
-		}
-		else
-		{
-			if(gLastChangeLevelTick[0])
-			{
-				if(getDiffTickFromNow(gLastChangeLevelTick[0]) > LED_INITIAL_DISPLAY)
-				{
-					for(i=1;i<5;i++)
-						LED_OFF(i);
-				}
-				if(getDiffTickFromNow(gLastChangeLevelTick[0]) > LED_INITIAL_DISPLAY_END)
-				{
-					gIsFisrtChangeLevel[1]=1;
-				}
-			}
-			else
-			{
-				for(i=1;i<5;i++)
-					LED_ON(i);
-				gLastChangeLevelTick[0] = getSysTick();
-				if(gLastChangeLevelTick[0] == 0)
-				{
-					EA = 0;
-					shortTick = 1;
-					EA =1;
-					gLastChangeLevelTick[0] = 1;
-				}
-			}
-		}
 	}
 	#endif
 }
