@@ -482,6 +482,7 @@ void FastCharge(u8 batNum)
 	if(gChargingTimeTick[batNum] > BAT_START_DV_COUNT)  //hod-off time, in this period, we do NOT detect -dv
 	{
 		tempV = getVbatAdc(batNum);
+		#if 0
 		if(preVoltData[batNum])
 		{
 			tempV = ((preVoltData[batNum]<<2) + tempV)/5;
@@ -491,6 +492,7 @@ void FastCharge(u8 batNum)
 		{
 			preVoltData[batNum] = tempV;
 		}
+		#endif
 		
 		if(tempV > BAT_VOLT_NEAR_FULL)
 			gNearFullTimeTick[batNum]++;
