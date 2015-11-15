@@ -604,6 +604,15 @@ void chargeHandler(void)
 
 		if(chargingTime != 0)
 		{
+			if(battery_state == STATE_DEAD_BATTERY)
+			{
+				tempV = getVbatAdc(gIsChargingBatPos);
+				if(tempV >= BAT_MAX_VOLT_OPEN)
+				{
+					StatusChange(gIsChargingBatPos, STATE_BATTERY_TYPE_ERROR);
+					return;
+				}
+			}
 			isPwmOn = 1;
 			PwmControl(PWM_ON);
 			gChargingStatus = SYS_CHARGING_STATUS_NORMAL;
