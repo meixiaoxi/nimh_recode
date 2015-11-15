@@ -451,11 +451,12 @@ void PreCharge(u8 batNum)
 		}
 		else
 		{ 
-			gBatVoltArray[batNum] = getVbatWithNoMos(batNum);
+			gBatVoltArray[batNum] = getVbatAdc(batNum);
 			if(gBatVoltArray[batNum] >= CHARGING_PRE_END_VOLT )
 			{				
 				gChargingTimeTick[batNum] = 0;
 				StatusChange(batNum,STATE_NORMAL_CHARGING);
+				gChargeChildStatus[batNum] = CHARGE_STATE_FAST;
 			}
 			else
 			{
@@ -480,7 +481,7 @@ void FastCharge(u8 batNum)
 
 	if(gChargingTimeTick[batNum] > BAT_START_DV_COUNT)  //hod-off time, in this period, we do NOT detect -dv
 	{
-		tempV = getVbatWithNoMos(batNum);
+		tempV = getVbatAdc(batNum);
 		if(preVoltData[batNum])
 		{
 			tempV = ((preVoltData[batNum]<<2) + tempV)/5;
@@ -540,7 +541,7 @@ void FastCharge(u8 batNum)
 	}
 	else
 	{
-		tempV = getVbatWithNoMos(batNum);
+		tempV = getVbatAdc(batNum);
 		if(tempV > BAT_VOLT_NEAR_FULL)
 			gNearFullTimeTick[batNum]++;
 		gBatVoltArray[batNum] = tempV;
@@ -609,7 +610,7 @@ void chargeHandler(void)
 		}
 		else
 		{
-			tempV = getVbatWithNoMos(gIsChargingBatPos);
+			tempV = getVbatAdc(gIsChargingBatPos);
 			if(battery_state == STATE_BATTERY_TEMPERATURE_ERROR)
 			{
 				tempT = getBatTemp(gIsChargingBatPos);
@@ -634,7 +635,7 @@ void chargeHandler(void)
 			{
 				if(battery_state == STATE_DEAD_BATTERY)
 				{	
-					tempV = getVbatWithNoMos(gIsChargingBatPos);
+					tempV = getVbatAdc(gIsChargingBatPos);
 					PwmControl(PWM_OFF);
 					if(tempV < BAT_ZERO_SPEC_VOLT)
 						StatusChange(gIsChargingBatPos,STATE_BATTERY_DETECT);
@@ -657,7 +658,7 @@ void chargeHandler(void)
 						gDelayCount++;
 						if(gDelayCount >=3)
 						{
-							tempV = getVbatWithNoMos(gIsChargingBatPos);
+							tempV = getVbatAdc(gIsChargingBatPos);
 							gBatVoltArray[gIsChargingBatPos] = tempV;
 							StatusChange(gIsChargingBatPos, STATE_NORMAL_CHARGING);
 							if(tempV< CHARGING_PRE_END_VOLT )
@@ -735,7 +736,7 @@ void chargeHandler(void)
 
 void PickBattery()
 {
-	u8 batNum,fitNum;
+	u8 batNum;
 
 
 		FindTwoBattery();
@@ -782,7 +783,8 @@ void PickBattery()
 								TotalTime[gIsChargingBatPos] = TotalTime[gIsChargingBatPos]+50;
 								break;
 						default:
-							break;
+								TotalTime[gIsChargingBatPos] = TotalTime[gIsChargingBatPos] +1;
+								break;
 					}
 				}
 				if(TotalTime[gIsChargingBatPos] >= 50)
@@ -812,7 +814,7 @@ void btRemove()
 		{	
 			if(gChargeChildStatus[gDetectRemovePos] == CHARGE_STATE_FAST)
 			{
-				tempV = getVbatWithNoMos(gDetectRemovePos);
+				tempV = getVbatAdc(gDetectRemovePos);
 				if(tempV < BAT_REMOVE_VOLT)
 				{
 					StatusChange(gDetectRemovePos,STATE_DEAD_BATTERY);
@@ -898,7 +900,7 @@ void InitConfig()
 
 void main()
 {
-	u8 cur_detect_pos=1,tempN;
+	u8 cur_detect_pos=1;
 	OSCCR = 0x20;		// internal OSC 8MHz
 	BITCR = 0x4E;		// BIT 16.384ms
 

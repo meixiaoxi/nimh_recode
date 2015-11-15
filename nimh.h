@@ -295,7 +295,7 @@ typedef 	 unsigned long		u32;
 #define BAT_CHARGING_FAST_MAX_COUNT		6600	// 55min (55min*60*1000/500)
 #define BAT_CHARGING_FAST_MAX_COUNT_AAA	6000	// 50min   (50*60*1000/500)
 #define BAT_INITIAL_FULL_CHECK_COUNT		180		// 1.5min  (90*1000/500)
-#define BAT_NEAR_FULL_MAX_COUNT			1200		//10min (10*60*1000/500)
+#define BAT_NEAR_FULL_MAX_COUNT			960		//8min (8*60*1000/500)
 
 
 #define BAT_INITIAL_FULL_CHECK_TIME	10986			// 3min  (3*60*1000)/16.384
@@ -355,7 +355,6 @@ u16 getAdcValue(u8 channel);
 u16 getVbatAdc(u8 channel);
 u16 getAverage(u8 channel);
 u16 getBatTemp(u8 batNum);
-u16 getVbatWithNoMos(u8 channel);
 
 void send(u16 sData);
 void sendStr(char str[]);

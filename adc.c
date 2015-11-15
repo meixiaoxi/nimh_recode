@@ -120,22 +120,3 @@ u16 getVbatAdc(u8 channel)
 	}
 	return (tempV-gChargeCurrent);
 }
-u16 getVbatWithNoMos(u8 channel)
-{
-	u16 tempV;
-	switch(channel)
-	{
-		case 0:
-			channel = CHANNEL_VBAT_1;break;
-		case 1:
-			channel = CHANNEL_VBAT_2;break;
-		case 2:
-			channel = CHANNEL_VBAT_3;break;
-		case 3:
-			channel = CHANNEL_VBAT_4;break;
-		default:
-			break;
-	}
-	tempV = getAverage(channel);
-	return tempV;
-}
