@@ -632,6 +632,7 @@ void chargeHandler(void)
 						if(gDelayCount >=3)
 						{
 							tempV = getVbatAdc(gIsChargingBatPos);
+							tempT = getBatTemp(gIsChargingBatPos);
 							gBatVoltArray[gIsChargingBatPos] = tempV;
 							StatusChange(gIsChargingBatPos, STATE_NORMAL_CHARGING);
 							if(tempV< CHARGING_PRE_END_VOLT )

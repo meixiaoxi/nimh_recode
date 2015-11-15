@@ -73,7 +73,7 @@ u16 getBatTemp(u8 batNum)
 
 
 
-	if(batNum <2)
+	if(batNum <BT_3)
 	{
 		tempT = getAverage(CHANNEL_TEMP_1);
 	}
