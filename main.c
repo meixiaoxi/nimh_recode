@@ -17,6 +17,7 @@ u8 gChargeSkipCount[] = {0,0,0,0};
 
 u16 preVoltData[4] ={0,0,0,0};
 
+u8 gErrorCount[4] = {0,0,0,0};
 
 u8 skipCount;
 u16 isPwmOn = 0;
@@ -29,7 +30,7 @@ u32 idata gChargingTimeTick[4] ={0,0,0,0};
 //u32 idata gLastChangeLevelTick[4]= {0,0,0,0};
 //u8   idata gIsFisrtChangeLevel[4] = {0,0,0,0};
 
-u8 idata gCurrentLevel[2];
+u8 idata gCurrentLevel[2] = {1,1};
 u8 idata gIsInTwoState= 0;
 u8 idata gNowTwoBuf[2];
 
@@ -252,6 +253,8 @@ void removeAllBat()
 	gBatType[i] = 0;
 	}
 
+	gCurrentLevel[0] = CURRENT_LEVEL_1;
+	gCurrentLevel[1] = CURRENT_LEVEL_1;
 	
 	//PWM
 	P30 =0;
@@ -532,10 +535,10 @@ void FastCharge(u8 batNum)
 
 void chargeHandler(void)
 {
-	u16 tempT,tempV;
+	u16 tempT,tempV,temp_2;
 	u8 battery_state = gBatStateBuf[gIsChargingBatPos];
 	static u8 chargingTime = 0;
-	u8 chargingCurrent = 0;
+	u8 chargingCurrent = 0,temp_3;
 	if(gChargingStatus == SYS_CHARGING_STATUS_DETECT)
 	{
 		if(battery_state == STATE_DEAD_BATTERY)
@@ -668,6 +671,67 @@ void chargeHandler(void)
 						PwmControl(PWM_OFF);
 						gChargingStatus = SYS_CHARGING_STATUS_DETECT;
 						return;
+					}
+					
+					if(gDelayCount == 0)
+					{
+						if(gIsChargingBatPos == BT_4 || gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
+						{
+						#ifdef DVT_BOARD
+							if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
+								temp_3 = 0;
+							else
+								temp_3 = 1;
+							if(gCurrentLevel[temp_3] == CURRENT_LEVEL_1)
+								temp_2 = BAT_MAX_VOLT_CLOSE_CHANNEL_4;
+							else if(gCurrentLevel[temp_3] == CURRENT_LEVEL_2)
+								temp_2 = BAT_MAX_CLOSE_CHANNEL_4_LEVEL_2;
+						#else
+							temp_2 = BAT_MAX_VOLT_CLOSE_CHANNEL_4;
+						#endif	
+						}
+						else
+						{
+						#ifdef DVT_BOARD
+							if(gCurrentLevel[1] == CURRENT_LEVEL_1)
+								temp_2 = BAT_MAX_VOLT_CLOSE;
+							else if(gCurrentLevel[1] == CURRENT_LEVEL_2)
+								temp_2 = BAT_MAX_CLOS_LEVEL_2;
+						#else
+							temp_2 = BAT_MAX_VOLT_CLOSE;
+						#endif	
+						}
+						if(tempV > temp_2)
+						{
+							gErrorCount[gIsChargingBatPos]++;
+							if(gErrorCount[gIsChargingBatPos] >=3)
+							{
+								PwmControl(PWM_OFF);
+								StatusChange(gIsChargingBatPos,STATE_BATTERY_TYPE_ERROR);
+								gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+								return;
+							}
+						}
+						#ifdef DVT_BOARD
+						temp_2 = getAdcValue(CHANNEL_VIN_5V);
+						if(temp_2 < VIN_5V_MINUM)
+						{
+							temp_2 = getAdcValue(CHANNEL_VIN_5V);
+							if(temp_2 < VIN_5V_MINUM)
+							{
+								if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
+								{
+									if(gCurrentLevel[0] < CURRENT_LEVEL_2)
+										gCurrentLevel[0]++;
+								}
+								else
+								{
+									if(gCurrentLevel[1] < CURRENT_LEVEL_2)
+										gCurrentLevel[1]++;
+								}
+							}
+						}
+						#endif
 					}
 					PwmControl(PWM_OFF);
 					gDelayCount++;

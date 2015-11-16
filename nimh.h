@@ -8,6 +8,7 @@ typedef	 unsigned short 		u16;
 typedef 	 unsigned long		u32;
 
 #define EVT_BOARD
+
 #define GET_FACTORY_STATUS()	(P2&0x20)
 
 #define		cli()		do{IE &= ~0x80;}while(0)
@@ -53,6 +54,9 @@ typedef 	 unsigned long		u32;
 #define CHARGING_TIME_500MS	50
 //#define CHARGING_TIME_1S		100
 
+#define CURRENT_LEVEL_1		1
+#define CURRENT_LEVEL_2		2
+#define CURRENT_LEVEL_3		3
 
 #define SYS_CHARGING_STATUS_DETECT	0
 #define SYS_CHARGING_STATUS_NORMAL	1
@@ -92,6 +96,9 @@ typedef 	 unsigned long		u32;
 
 #define BAT_MAX_VOLT_CLOSE 2482		//(2/3.3*4096)        (1.8/3.3)*4096	
 #define BAT_MAX_VOLT_CLOSE_CHANNEL_4		2234	//(1.8/3.3)*4096
+
+#define BAT_MAX_CLOS_LEVEL_2		2159				//(1.65+0.09)  (1.74/3.3*4096)
+#define BAT_MAX_CLOSE_CHANNEL_4_LEVEL_2	 2048		// (1.65   1.65/3.3)*4096
 
 
 #define BAT_LEVEL_LOW_TO_MIDD		1737			// 1.4     (1.4/3.3)*4096
