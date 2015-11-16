@@ -160,7 +160,7 @@ do
 				else
 				{
 					gOutputStatus = OUTPUT_STATUS_WAIT;
-					LED_OFF(1),LED_OFF(2),LED_OFF(3),LED_OFF(4);
+					LED_OFF(BT_1),LED_OFF(BT_2),LED_OFF(BT_3),LED_OFF(BT_4);
 					DISABLE_BOOST();
 				}				
 		}		
