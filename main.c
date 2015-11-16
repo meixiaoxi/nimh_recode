@@ -810,16 +810,45 @@ void btRemove()
 //π§≥ß≤‚ ‘
 void factoryTest()
 {
+	gIsChargingBatPos = 1;
 	while(1)
 	{
 		gSysStatus = GET_SYS_STATUS();
 		if(gSysStatus == SYS_CHARGING_STATE)
+		{
+			LED_OFF(BT_1);LED_OFF(BT_2);LED_OFF(BT_3);LED_OFF(BT_4);
 			break;
+		}
+		if(gIsChargingBatPos)
+		{
+			LED_ON(BT_1);LED_ON(BT_2);LED_ON(BT_3);LED_ON(BT_4);
+			delay_ms(100);
+			gIsChargingBatPos = 0;
+		}
+		else
+		{
+			LED_OFF(BT_1);LED_OFF(BT_2);LED_OFF(BT_3);LED_OFF(BT_4);
+			delay_ms(100);
+			gIsChargingBatPos = 1;
+		}
 		ClrWdt();
+		if(GET_FACTORY_STATUS())
+		{
+			while(1)
+			{
+				
+			}
+		}
 	}
-	delay_ms(500);
+	delay_ms(100);
 	for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 	{
+		if(GET_FACTORY_STATUS() == 0)
+		{
+			while(1)
+			{
+			}
+		}
 		ClrWdt();
 		gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
 		if(gBatVoltArray[gIsChargingBatPos] >1923 || gBatVoltArray[gIsChargingBatPos] < 1799 )
@@ -840,6 +869,12 @@ void factoryTest()
 
 	while(1)
 	{
+		if(GET_FACTORY_STATUS() == 0)
+		{
+			while(1)
+			{
+			}
+		}
 		gSysStatus = GET_SYS_STATUS();
 		if(gSysStatus == SYS_CHARGING_STATE)
 		{
