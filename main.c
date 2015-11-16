@@ -136,9 +136,13 @@ do
 				{
 					preVoltData[cur_detect_pos] = getVbatAdc(cur_detect_pos);
 
+					#ifdef EVT_BOARD
 					if(cur_detect_pos == BT_4 || cur_detect_pos == BT_3)
 						preVoltData[cur_detect_pos] = preVoltData[cur_detect_pos]/3;
-					
+					#else
+					if(cur_detect_pos == BT_4)
+						preVoltData[cur_detect_pos] = preVoltData[cur_detect_pos]/3;
+					#endif
 					gBatVoltArray[0] = preVoltData[cur_detect_pos-1] -preVoltData[cur_detect_pos];
 
 					if(preVoltData[cur_detect_pos] > preVoltData[cur_detect_pos-1] ||( gBatVoltArray[0]<MIN_VBAT_OUTPUT_IDLE))
