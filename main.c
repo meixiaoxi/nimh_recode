@@ -1,7 +1,6 @@
 #include "MC96F8316.h"
 #include "nimh.h"
 
-u32 idata gUpdateDebanceTick[4];
 u8 gPreChargingBatPos = BT_NULL;
 u32 shortTick=0;
 
@@ -9,14 +8,12 @@ u8 gSysStatus;
 u8 gOutputStatus;
 
 u8  isFromOutput = 0;
-
-//type_error charge_error  pre  fast sup  trick  charging(on_off)  is_detect(电池检测) bat_state(valid)
-//the first byte is a dummy						
+				
 u8 gBatStateBuf[4] = {0,0,0,0};
 
 u16 gBatVoltArray[4]={0,0,0,0};
 
-u8 gChargeSkipCount[] = {0,0,0,0};    //控制PWM周期
+u8 gChargeSkipCount[] = {0,0,0,0};
 
 u16 preVoltData[4] ={0,0,0,0};
 
@@ -39,7 +36,7 @@ u8 idata gNowTwoBuf[2];
 
 
 u8 TotalTime[4] = {0,0,0,0};
-u8 gIsChargingBatPos=BT_1;
+u8 gIsChargingBatPos=BT_NULL;
 u8 gChargingStatus = SYS_CHARGING_STATUS_DETECT;
 u8 gChargeChildStatus[4] = {0,0,0,0};
 u16 gChargeCurrent_2;
@@ -225,6 +222,7 @@ void removeBat(u8 batNum)
 	gNearFullTimeTick[batNum] = 0;
 	TotalTime[batNum] = 0;
 	LED_OFF(batNum);
+	gBatType[batNum] = 0;
 	//PB &= 0xF0;   //close current pwm channel
 	PwmControl(PWM_OFF);
 
@@ -247,6 +245,7 @@ void removeAllBat()
 	gNearFullTimeTick[i] = 0;
 	LED_OFF(i);
 	TotalTime[i] = 0;
+	gBatType[i] = 0;
 	}
 
 	
@@ -258,7 +257,7 @@ void removeAllBat()
 
 	isPwmOn =0; 
 	
-	gIsChargingBatPos = BT_1;
+	gIsChargingBatPos = BT_NULL;
 	gPreChargingBatPos = BT_NULL;
 	gIsInTwoState = 0;
 }
@@ -702,6 +701,11 @@ void chargeHandler(void)
 					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
 				}
 				else if(battery_state == STATE_BATTERY_FULL)
+				{
+					PwmControl(PWM_OFF);
+					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+				}
+				else
 				{
 					PwmControl(PWM_OFF);
 					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
