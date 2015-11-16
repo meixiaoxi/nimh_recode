@@ -178,7 +178,7 @@ else
 		      else //µÚÒ»´Î
 		      {
 				gBatStateBuf[1] = 1;
-				gBatStateBuf[2] =1;
+				gBatStateBuf[2] =BT_1;
 				gBatStateBuf[3] = 1;
 				LED_ON(BT_1);
 			}

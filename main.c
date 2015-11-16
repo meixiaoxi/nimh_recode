@@ -133,7 +133,7 @@ do
 		gDelayCount++;
 		if(gDelayCount> 49)
 		{
-			gDelayCount++;
+			gDelayCount=0;
 			preVoltData[0] = getVbatAdc(BT_1);
 				for(cur_detect_pos = BT_2; cur_detect_pos <=BT_4; cur_detect_pos++)
 				{
@@ -149,10 +149,13 @@ do
 				}
 				if(cur_detect_pos == BT_NULL)
 				{
-					gOutputStatus = OUTPUT_STATUS_NORMAL;
-					gBatStateBuf[0] = 0;
-					ENABLE_BOOST();
-					//updateBatLevel(gBatVoltArray[1][0],gCount+1);
+					if(gOutputStatus == OUTPUT_STATUS_WAIT)
+					{
+						gOutputStatus = OUTPUT_STATUS_NORMAL;
+						gBatStateBuf[0] = 0;
+						ENABLE_BOOST();
+						//updateBatLevel(gBatVoltArray[1][0],gCount+1);
+					}
 				}
 				else
 				{
