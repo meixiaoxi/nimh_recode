@@ -935,20 +935,26 @@ void btRemove()
 {
 	u16 tempV;
 
-	if(gIsChargingBatPos != gDetectRemovePos)
+	if(gIsChargingBatPos == gDetectRemovePos)
 	{
-		if(gBatStateBuf[gDetectRemovePos] >= STATE_NORMAL_CHARGING && gBatStateBuf[gDetectRemovePos] <=STATE_BATTERY_TEMPERATURE_ERROR)
-		{	
-			if(gChargeChildStatus[gDetectRemovePos] == CHARGE_STATE_FAST)
+		if(gDetectRemovePos >= BT_4)
+			gDetectRemovePos = BT_1;
+		else
+			gDetectRemovePos++;
+	}
+
+	if(gBatStateBuf[gDetectRemovePos] >= STATE_NORMAL_CHARGING && gBatStateBuf[gDetectRemovePos] <=STATE_BATTERY_TEMPERATURE_ERROR)
+	{	
+		if(gChargeChildStatus[gDetectRemovePos] == CHARGE_STATE_FAST)
+		{
+			tempV = getVbatAdc(gDetectRemovePos);
+			if(tempV < BAT_REMOVE_VOLT)
 			{
-				tempV = getVbatAdc(gDetectRemovePos);
-				if(tempV < BAT_REMOVE_VOLT)
-				{
-					StatusChange(gDetectRemovePos,STATE_DEAD_BATTERY);
-				}
+				StatusChange(gDetectRemovePos,STATE_DEAD_BATTERY);
 			}
 		}
 	}
+
 	if(gDetectRemovePos >= BT_4)
 		gDetectRemovePos = BT_1;
 	else
