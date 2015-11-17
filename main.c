@@ -25,12 +25,14 @@ u16 isPwmOn = 0;
 u8 dropCount[4] = {0,0,0,0};	
 u8 fitCount[4] = {0,0,0,0};
 
+u8  gSmallModeCount[4] = {0,0,0,0};
 u32 idata gNearFullTimeTick[4] = {0,0,0,0};
 u32 idata gChargingTimeTick[4] ={0,0,0,0};
 //u32 idata gLastChangeLevelTick[4]= {0,0,0,0};
 //u8   idata gIsFisrtChangeLevel[4] = {0,0,0,0};
 
 u8 idata gCurrentLevel[2] = {1,1};
+u8 idata gCurrentNow = 1;
 u8 idata gIsInTwoState= 0;
 u8 idata gNowTwoBuf[2];
 
@@ -122,8 +124,8 @@ void FindTwoBattery()
 #if 1
 void outputHandler()
 {
-	u8 cur_detect_pos;
-
+	u8 cur_detect_pos,isVbatOk = 1;
+	u16 temp_min;
 do
 {
 	if(gOutputStatus != OUTPUT_STATUS_STOP)
@@ -132,29 +134,50 @@ do
 		if(gDelayCount> 49)
 		{
 			gDelayCount=0;
-			preVoltData[0] = getVbatAdc(BT_1);
-				for(cur_detect_pos = BT_2; cur_detect_pos <=BT_4; cur_detect_pos++)
+		//	if(gOutputStatus == OUTPUT_STATUS_WAIT)
+		//		gBatStateBuf[0] = 1;
+			if(gOutputStatus == OUTPUT_STATUS_NORMAL)
+				temp_min = MIN_VBAT_OUPUT;
+			else
+				temp_min = MIN_VBAT_OUTPUT_IDLE;
+
+			for(cur_detect_pos = BT_1; cur_detect_pos <=BT_4; cur_detect_pos++)
+			{
+				preVoltData[cur_detect_pos] = getVbatAdc(cur_detect_pos);
+				#ifdef EVT_BOARD
+				if(cur_detect_pos == BT_4 || cur_detect_pos == BT_3)
+					preVoltData[cur_detect_pos] = preVoltData[cur_detect_pos]/3;
+				#else
+				if(cur_detect_pos == BT_4)
+					preVoltData[cur_detect_pos] = preVoltData[cur_detect_pos]/3;
+				#endif
+
+			}
+			for(cur_detect_pos = BT_2; cur_detect_pos <=BT_4; cur_detect_pos++)
+			{
+				if(preVoltData[cur_detect_pos] > preVoltData[cur_detect_pos-1])
+					gBatVoltArray[cur_detect_pos-1] = 0;
+				else
+					gBatVoltArray[cur_detect_pos-1] = preVoltData[cur_detect_pos-1] -preVoltData[cur_detect_pos];
+				if(gBatVoltArray[cur_detect_pos-1] < temp_min)
 				{
-					preVoltData[cur_detect_pos] = getVbatAdc(cur_detect_pos);
-
-					#ifdef EVT_BOARD
-					if(cur_detect_pos == BT_4 || cur_detect_pos == BT_3)
-						preVoltData[cur_detect_pos] = preVoltData[cur_detect_pos]/3;
-					#else
-					if(cur_detect_pos == BT_4)
-						preVoltData[cur_detect_pos] = preVoltData[cur_detect_pos]/3;
-					#endif
-					gBatVoltArray[0] = preVoltData[cur_detect_pos-1] -preVoltData[cur_detect_pos];
-
-					if(preVoltData[cur_detect_pos] > preVoltData[cur_detect_pos-1] ||( gBatVoltArray[0]<MIN_VBAT_OUTPUT_IDLE))
-						break;	
-				}
-				if(cur_detect_pos == BT_NULL)
+					isVbatOk = 0;
+					if(gOutputStatus == OUTPUT_STATUS_WAIT)
+					{
+						if(gBatVoltArray[cur_detect_pos-1] < MIN_OUTPUT_DISPLAY_VOLT)
+							gBatStateBuf[0] = 1;
+					}	
+				}	
+			}
+			
+				
+				if(isVbatOk== 1)
 				{
 					if(gOutputStatus == OUTPUT_STATUS_WAIT)
 					{
 						gOutputStatus = OUTPUT_STATUS_NORMAL;
 						gBatStateBuf[0] = 0;
+						gIsInTwoState = 0;
 						ENABLE_BOOST();
 						//updateBatLevel(gBatVoltArray[1][0],gCount+1);
 					}
@@ -255,6 +278,8 @@ void removeAllBat()
 
 	gCurrentLevel[0] = CURRENT_LEVEL_1;
 	gCurrentLevel[1] = CURRENT_LEVEL_1;
+
+	setCurrent(CURRENT_LEVEL_1);
 	
 	//PWM
 	P30 =0;
@@ -533,29 +558,71 @@ void FastCharge(u8 batNum)
 
 }
 
+
+//CUR_CTL	P32
+//CUR_CTL2	P36
+// 0 input  1 output
+void setCurrent(u8 level)
+{
+	if(gCurrentNow == level)
+		return;
+	
+	if(level == CURRENT_LEVEL_1) //输入高阻
+	{
+		P3IO &= 0xBB;  //输入
+	}
+	else if(level == CURRENT_LEVEL_2) //CUR_CTL输出低 CUR_CTL2高阻
+	{
+		P3IO |= 0x04;  //cur_ctl输出
+		P32 = 0;
+		
+		P3IO &= 0xBF; //cur_ctl2 输入
+	}
+	else if(level == CURRENT_LEVEL_3)
+	{
+		P3IO |= 0xFB;   //cur_ctl输入	
+
+		P3IO |= 0x40;
+		P36 = 0;
+	}
+	gCurrentNow = level;
+}
 void chargeHandler(void)
 {
 	u16 tempT,tempV,temp_2;
 	u8 battery_state = gBatStateBuf[gIsChargingBatPos];
 	static u8 chargingTime = 0;
-	u8 chargingCurrent = 0,temp_3;
+	u8 chargeCurrent = 0,temp_3;
 	if(gChargingStatus == SYS_CHARGING_STATUS_DETECT)
 	{
 		if(battery_state == STATE_DEAD_BATTERY)
 		{
 			chargingTime = CHARGING_TIME_10MS;
+			chargeCurrent = CURRENT_LEVEL_2;
 		}
 		else if(battery_state == STATE_BATTERY_DETECT)
 		{
 			chargingTime = CHARGING_TIME_500MS;
+			chargeCurrent = CURRENT_LEVEL_1;
 		}
 		else if(battery_state == STATE_NORMAL_CHARGING)
 		{
 			chargingTime = CHARGING_TIME_500MS;
+			if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
+				temp_3 = 0;
+			else
+				temp_3 = 1;
+			if(gCurrentLevel[temp_3] == CURRENT_LEVEL_1)
+				chargeCurrent = CURRENT_LEVEL_1;
+			else if(gCurrentLevel[temp_3]  == CURRENT_LEVEL_2)
+				chargeCurrent = CURRENT_LEVEL_2;
+			else
+					chargeCurrent = CURRENT_LEVEL_3;
 		}
 		else if(battery_state == STATE_ZERO_BATTERY_TEMPERATURE_ERROR || battery_state == STATE_ZERO_BATTERY_CHARGE_ERROR)
 		{
 			chargingTime = CHARGING_TIME_10MS;
+			chargeCurrent = CURRENT_LEVEL_3;
 		}
 		else if(battery_state == STATE_BATTERY_TYPE_ERROR)
 		{
@@ -585,6 +652,9 @@ void chargeHandler(void)
 				}
 			}
 			isPwmOn = 1;
+			#ifdef DVT_BOARD
+			setCurrent(chargeCurrent);
+			#endif
 			PwmControl(PWM_ON);
 			gChargingStatus = SYS_CHARGING_STATUS_NORMAL;
 			gDelayCount =0;

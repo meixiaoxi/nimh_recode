@@ -8,6 +8,7 @@ typedef	 unsigned short 		u16;
 typedef 	 unsigned long		u32;
 
 #define EVT_BOARD
+//#define DVT_BOARD
 
 #define GET_FACTORY_STATUS()	(P2&0x20)
 
@@ -127,6 +128,8 @@ typedef 	 unsigned long		u32;
 #define MIN_VBAT_OUTPUT_IDLE		488	// (1.18/3 = 0.41  0.65/3.3*4096)
 #define	OUTPUT_SHOW_LEVEL_3		537	//(1.3/3  0.65/3.3*4096 )
 #define	OUTPUT_SHOW_LEVEL_2		517	//(1.25/3 0.625/3.3*4096)	
+
+#define	MIN_OUTPUT_DISPLAY_VOLT	289	 // 0.7  0.7/3/3.3*4096
 
 #define	BAT_LEVEL_43_OUTPUT		521      // 1.26/3 (1.26/3.3/2*4096)
 #define 	BAT_LEVEL_32_OUTPUT		508      //  1.23/3 (1.23/3.3/2*4096)
@@ -371,4 +374,6 @@ void LED_OFF(u8 led);
 void LED_ON(u8 led);
 
 void delay_ms(u16 nus);
+
+void setCurrent(u8 level);
 #endif
