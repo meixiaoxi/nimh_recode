@@ -153,13 +153,13 @@ do
 				#endif
 
 			}
-			for(cur_detect_pos = BT_2; cur_detect_pos <=BT_4; cur_detect_pos++)
+			for(cur_detect_pos = BT_1; cur_detect_pos <BT_4; cur_detect_pos++)
 			{
-				if(preVoltData[cur_detect_pos] > preVoltData[cur_detect_pos-1])
-					gBatVoltArray[cur_detect_pos-1] = 0;
+				if(preVoltData[cur_detect_pos+1] > preVoltData[cur_detect_pos])
+					gBatVoltArray[cur_detect_pos] = 0;
 				else
-					gBatVoltArray[cur_detect_pos-1] = preVoltData[cur_detect_pos-1] -preVoltData[cur_detect_pos];
-				if(gBatVoltArray[cur_detect_pos-1] < temp_min)
+					gBatVoltArray[cur_detect_pos] = preVoltData[cur_detect_pos] -preVoltData[cur_detect_pos+1];
+				if(gBatVoltArray[cur_detect_pos] < temp_min)
 				{
 					isVbatOk = 0;
 					if(gOutputStatus == OUTPUT_STATUS_WAIT)
@@ -169,7 +169,15 @@ do
 					}	
 				}	
 			}
-			
+			if(preVoltData[BT_3] < temp_min)
+			{
+				isVbatOk = 0;
+				if(gOutputStatus == OUTPUT_STATUS_WAIT)
+				{
+					if(preVoltData[BT_3] < MIN_OUTPUT_DISPLAY_VOLT)
+						gBatStateBuf[0] = 1;
+				}	
+			}
 				
 				if(isVbatOk== 1)
 				{
@@ -966,37 +974,22 @@ void btRemove()
 //¹¤³§²âÊÔ
 void factoryTest()
 {
-	gIsChargingBatPos = 1;
-	while(1)
+	gDetectRemovePos = 1;
+
+	gSysStatus = GET_SYS_STATUS();
+	while(gSysStatus != SYS_CHARGING_STATE)
 	{
 		gSysStatus = GET_SYS_STATUS();
-		if(gSysStatus == SYS_CHARGING_STATE)
-		{
-			LED_OFF(BT_1);LED_OFF(BT_2);LED_OFF(BT_3);LED_OFF(BT_4);
-			break;
-		}
-		if(gIsChargingBatPos)
-		{
-			LED_ON(BT_1);LED_ON(BT_2);LED_ON(BT_3);LED_ON(BT_4);
-			delay_ms(100);
-			gIsChargingBatPos = 0;
-		}
-		else
-		{
-			LED_OFF(BT_1);LED_OFF(BT_2);LED_OFF(BT_3);LED_OFF(BT_4);
-			delay_ms(100);
-			gIsChargingBatPos = 1;
-		}
 		ClrWdt();
-		if(GET_FACTORY_STATUS())
-		{
-			while(1)
-			{
-				
-			}
-		}
 	}
-	delay_ms(100);
+	
+do{
+	gBatVoltArray[0] = getAdcValue(CHANNEL_VIN_5V);
+	if(gBatVoltArray[0] > VIN_5V_TEST_MAX || gBatVoltArray[0] < VIN_5V_TEST_MIN)
+		break;
+
+	gDetectRemovePos++;
+	
 	for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 	{
 		if(GET_FACTORY_STATUS() == 0)
@@ -1012,16 +1005,18 @@ void factoryTest()
 			fitCount[gIsChargingBatPos] =1;
 			continue;
 		}
+		//gDetectRemovePos++;
 		PwmControl(PWM_ON);
 		delay_ms(700);
 		gBatVoltArray[gIsChargingBatPos]= getVbatAdc(gIsChargingBatPos);
-		if(gChargeCurrent < 40 || gChargeCurrent > 68)
+		if(gChargeCurrent < 10 || gChargeCurrent > 23)
 		{
 			fitCount[gIsChargingBatPos] = 2;
 		}
-		
+		//gDetectRemovePos++;
 		PwmControl(PWM_OFF);
 	}
+}while(0);
 
 	while(1)
 	{
@@ -1031,6 +1026,10 @@ void factoryTest()
 			{
 			}
 		}
+		if(gSysStatus != (GET_SYS_STATUS()))
+		{
+			LED_OFF(BT_1);LED_OFF(BT_2);LED_OFF(BT_3);LED_OFF(BT_4);
+		}
 		gSysStatus = GET_SYS_STATUS();
 		if(gSysStatus == SYS_CHARGING_STATE)
 		{
@@ -1038,7 +1037,7 @@ void factoryTest()
 			{
 				if(skipCount)
 				{
-					if(fitCount[gIsChargingBatPos] !=0)
+					if(fitCount[gIsChargingBatPos] !=0 || gDetectRemovePos <=1)
 					{
 						LED_OFF(gIsChargingBatPos);
 					}
@@ -1058,8 +1057,11 @@ void factoryTest()
 		{
 			for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 			{
-				if(fitCount[gIsChargingBatPos] == 1)
-					LED_ON(gIsChargingBatPos);
+				if(gDetectRemovePos != 1)
+				{
+					if(fitCount[gIsChargingBatPos] == 1)
+						LED_ON(gIsChargingBatPos);
+				}
 			}
 		}
 		ClrWdt();
