@@ -413,24 +413,6 @@ void batteryDetect(u8 batNum,u16 tempV)
 		return;
 	}
 
-	 #ifdef DVT_BOARD
-	tempV = getAdcValue(CHANNEL_VIN_5V);
-	if(tempV < VIN_5V_MINUM)
-	{
-		if(gBatType[batNum] == BAT_AAA_TYPE)
-			gCurrentLevel[0] = 1;
-		else
-			gCurrentLevel[1] = 1;
-	}
-	else
-	{
-		if(gBatType[batNum] == BAT_AAA_TYPE)
-			gCurrentLevel[0] = 0;
-		else
-			gCurrentLevel[1] = 0;
-
-	}
-	#endif
 	PwmControl(PWM_OFF);
 	
 }
@@ -472,7 +454,31 @@ void FastCharge(u8 batNum)
 	u16 tempV,tempT;
 	u32 overTimer = BAT_CHARGING_FAST_MAX_COUNT;
 
-	gChargingTimeTick[batNum]++;
+	if(gBatType[batNum] == BAT_AAA_TYPE)
+		tempT = 0;
+	else
+		tempT = 1;
+	if(gCurrentLevel[tempT] == CURRENT_LEVEL_1)	
+		gChargingTimeTick[batNum]++;
+	else if(gCurrentLevel[tempT] == CURRENT_LEVEL_2)
+	{
+		gSmallModeCount[batNum]++;
+		if(gSmallModeCount[batNum] >= 7)
+		{
+			gChargingTimeTick[batNum] = gChargingTimeTick[batNum]+3;
+			gSmallModeCount[batNum] = 0;
+		}
+	}
+	else
+	{
+		gSmallModeCount[batNum]++;
+		if(gSmallModeCount[batNum] >= 14)
+		{
+			gChargingTimeTick[batNum] = gChargingTimeTick[batNum]+3;
+			gSmallModeCount[batNum] = 0;
+		}
+	}
+		
 	tempT = getBatTemp(batNum);
 
 	if(gChargingTimeTick[batNum] > BAT_START_DV_COUNT)  //hod-off time, in this period, we do NOT detect -dv
@@ -567,18 +573,18 @@ void setCurrent(u8 level)
 	if(gCurrentNow == level)
 		return;
 	
-	if(level == CURRENT_LEVEL_1) //输入高阻
+	if(level == CURRENT_LEVEL_1) //输入高阻     2A 900mA
 	{
 		P3IO &= 0xBB;  //输入
 	}
-	else if(level == CURRENT_LEVEL_2) //CUR_CTL输出低 CUR_CTL2高阻
+	else if(level == CURRENT_LEVEL_2) //CUR_CTL输出低 CUR_CTL2高阻  900mA  360mA
 	{
 		P3IO |= 0x04;  //cur_ctl输出
 		P32 = 0;
 		
 		P3IO &= 0xBF; //cur_ctl2 输入
 	}
-	else if(level == CURRENT_LEVEL_3)
+	else if(level == CURRENT_LEVEL_3)  //  200mA   90mA 
 	{
 		P3IO |= 0xFB;   //cur_ctl输入	
 
@@ -618,6 +624,8 @@ void chargeHandler(void)
 				chargeCurrent = CURRENT_LEVEL_2;
 			else
 					chargeCurrent = CURRENT_LEVEL_3;
+			if(gChargeChildStatus[gIsChargingBatPos] == CHARGE_STATE_PRE)
+				chargeCurrent = CURRENT_LEVEL_3;
 		}
 		else if(battery_state == STATE_ZERO_BATTERY_TEMPERATURE_ERROR || battery_state == STATE_ZERO_BATTERY_CHARGE_ERROR)
 		{
@@ -791,12 +799,12 @@ void chargeHandler(void)
 							{
 								if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
 								{
-									if(gCurrentLevel[0] < CURRENT_LEVEL_2)
+									if(gCurrentLevel[0] < CURRENT_LEVEL_3)
 										gCurrentLevel[0]++;
 								}
 								else
 								{
-									if(gCurrentLevel[1] < CURRENT_LEVEL_2)
+									if(gCurrentLevel[1] < CURRENT_LEVEL_3)
 										gCurrentLevel[1]++;
 								}
 							}
