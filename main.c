@@ -169,12 +169,12 @@ do
 					}	
 				}	
 			}
-			if(preVoltData[BT_3] < temp_min)
+			if(preVoltData[BT_4] < temp_min)
 			{
 				isVbatOk = 0;
 				if(gOutputStatus == OUTPUT_STATUS_WAIT)
 				{
-					if(preVoltData[BT_3] < MIN_OUTPUT_DISPLAY_VOLT)
+					if(preVoltData[BT_4] < MIN_OUTPUT_DISPLAY_VOLT)
 						gBatStateBuf[0] = 1;
 				}	
 			}
@@ -185,6 +185,9 @@ do
 					{
 						gOutputStatus = OUTPUT_STATUS_NORMAL;
 						gBatStateBuf[0] = 0;
+						gBatStateBuf[1] = 0;
+						gBatStateBuf[2] = 0;
+						gBatStateBuf[3] = 0;
 						gIsInTwoState = 0;
 						ENABLE_BOOST();
 						//updateBatLevel(gBatVoltArray[1][0],gCount+1);
