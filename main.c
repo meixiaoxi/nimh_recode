@@ -19,7 +19,7 @@ u16 preVoltData[4] ={0,0,0,0};
 
 u8 gErrorCount[4] = {0,0,0,0};
 
-u8 skipCount;
+u8 skipCount = 0;
 u16 isPwmOn = 0;
 
 u8 dropCount[4] = {0,0,0,0};	
@@ -181,8 +181,37 @@ do
 						gBatStateBuf[0] = 1;
 				}	
 			}
+
+			if(skipCount == 0)  //ÎÂ¶ÈÕý³£
+			{
+				temp_min = getBatTemp(BT_1);
+				if(temp_min < ADC_TEMP_OUTPUT_MAX || temp_min > ADC_TEMP_OUTPUT_MIN)
+				{
+					skipCount = 1;
+				}
+				else
+				{
+					temp_min = getBatTemp(BT_3);
+					if(temp_min < ADC_TEMP_OUTPUT_MAX || temp_min > ADC_TEMP_OUTPUT_MIN)
+					{
+						skipCount = 1;
+					}
+				}
+			}
+			else
+			{
+				temp_min = getBatTemp(BT_1);
+				if(temp_min > ADC_TEMP_OUTPUT_MAX_RECOVERY&& temp_min < ADC_TEMP_OUTPUT_MIN_RECOVERY)
+				{
+					temp_min = getBatTemp(BT_3);
+					if(temp_min > ADC_TEMP_OUTPUT_MAX_RECOVERY && temp_min < ADC_TEMP_OUTPUT_MIN_RECOVERY)
+					{
+						skipCount = 0;
+					}
+				}
+			}
 				
-				if(isVbatOk== 1)
+				if(isVbatOk== 1 && skipCount == 0)
 				{
 					if(gOutputStatus == OUTPUT_STATUS_WAIT)
 					{
@@ -199,7 +228,10 @@ do
 				else
 				{
 					gOutputStatus = OUTPUT_STATUS_WAIT;
-					LED_OFF(BT_1),LED_OFF(BT_2),LED_OFF(BT_3),LED_OFF(BT_4);
+					if(gBatStateBuf[0])
+					{
+						LED_OFF(BT_1),LED_OFF(BT_2),LED_OFF(BT_3),LED_OFF(BT_4);
+					}
 					DISABLE_BOOST();
 				}				
 		}		
@@ -323,6 +355,7 @@ void StatusCheck()
 					isFromOutput = 0;
 					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
 					gDelayCount = 50;
+					skipCount = 0;
 				}
 			}
 			else

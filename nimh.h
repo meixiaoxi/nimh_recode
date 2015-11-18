@@ -161,6 +161,14 @@ typedef 	 unsigned long		u32;
 #define ADC_TEMP_MAX_RECOVERY    1509	  //40
 #define ADC_TEMP_MIN_RECOVERY	    2934	 // 2
 
+
+//output temp
+#define ADC_TEMP_OUTPUT_MAX	   839       //65
+#define ADC_TEMP_OUTPUT_MIN	   3331		 // -10
+
+#define ADC_TEMP_OUTPUT_MAX_RECOVERY	   948       //60
+#define ADC_TEMP_OUTPUT_MIN_RECOVERY	   3177		 // -5
+
 #elif (LDO_LEVEL == 4000)
 #warning "4v ldo"
 
