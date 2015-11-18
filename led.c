@@ -49,7 +49,7 @@ void LED_OFF(u8 led)
 
 
 u8 ledDisplayCount = 0, ledErrorCount =0;
-u8 gLedStatus = 0, ledErrorStatus = 0;
+u8 gLedStatus = 1, ledErrorStatus = 0;
 #if 1
 void ledHandler(void)
 {
@@ -63,7 +63,7 @@ if(gSysStatus == SYS_CHARGING_STATE)
 	{
 		for(i=BT_1;i<=BT_4;i++)
 		{
-			if(gBatStateBuf[i] == STATE_NORMAL_CHARGING ||gBatStateBuf[i] == STATE_BATTERY_FULL)
+			if(gBatStateBuf[i] == STATE_NORMAL_CHARGING ||gBatStateBuf[i] == STATE_BATTERY_FULL || gBatStateBuf[i] == STATE_BATTERY_DETECT)
 				LED_ON(i);
 		}
 		ledDisplayCount++;
@@ -77,7 +77,7 @@ if(gSysStatus == SYS_CHARGING_STATE)
 	{
 		for(i=BT_1;i<=BT_4;i++)
 		{
-			if(gBatStateBuf[i] == STATE_NORMAL_CHARGING)
+			if(gBatStateBuf[i] == STATE_NORMAL_CHARGING || gBatStateBuf[i] == STATE_DEAD_BATTERY || gBatStateBuf[i] == STATE_BATTERY_DETECT)
 				LED_OFF(i);		
 		}
 		ledDisplayCount++;

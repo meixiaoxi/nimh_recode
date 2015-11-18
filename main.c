@@ -48,7 +48,10 @@ u8 gBatType[4] = {0,0,0,0};
 u8 gDelayCount =0;
 u8 gChargeCount =0;
 u8 gDetectRemovePos=0;
-
+u8 gHasBat = 0;
+	
+extern u8 ledDisplayCount;
+extern u8 gLedStatus;
 void FindTwoBattery()
 {
 	u8 batNum,fitNum = 0;
@@ -330,6 +333,9 @@ void StatusCheck()
 				isFromOutput = 1;
 				removeAllBat();
 				gDelayCount = 0;
+
+				ledDisplayCount = 0;
+				gLedStatus = 1;
 			}
 		}	
 }
@@ -610,6 +616,7 @@ void chargeHandler(void)
 	u8 battery_state = gBatStateBuf[gIsChargingBatPos];
 	static u8 chargingTime = 0;
 	u8 chargeCurrent = 0,temp_3;
+
 	if(gChargingStatus == SYS_CHARGING_STATUS_DETECT)
 	{
 		if(battery_state == STATE_DEAD_BATTERY)
@@ -663,11 +670,16 @@ void chargeHandler(void)
 		{
 			if(battery_state == STATE_DEAD_BATTERY)
 			{
+				gHasBat = 0;
 				tempV = getVbatAdc(gIsChargingBatPos);
 				if(tempV >= BAT_MAX_VOLT_OPEN)
 				{
 					StatusChange(gIsChargingBatPos, STATE_BATTERY_TYPE_ERROR);
 					return;
+				}
+				else if(tempV >= BAT_HAS_BATTERY_VOLT)
+				{
+					gHasBat = 1;
 				}
 			}
 			isPwmOn = 1;
@@ -710,6 +722,10 @@ void chargeHandler(void)
 					PwmControl(PWM_OFF);
 					if(tempV < BAT_ZERO_SPEC_VOLT)
 						StatusChange(gIsChargingBatPos,STATE_BATTERY_DETECT);
+					else if(gHasBat)
+					{
+						StatusChange(gIsChargingBatPos,STATE_BATTERY_TYPE_ERROR);
+					}
 					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
 				}
 				else if(battery_state == STATE_BATTERY_DETECT)
