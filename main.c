@@ -699,7 +699,7 @@ void chargeHandler(void)
 				tempT = getBatTemp(gIsChargingBatPos);
 				if(tempV < BAT_MIN_VOLT_OPEN)
 					StatusChange(gIsChargingBatPos,STATE_DEAD_BATTERY);
-				else if(tempT > ADC_TEMP_MAX && tempT < ADC_TEMP_MIN)
+				else if(tempT > ADC_TEMP_MAX_RECOVERY && tempT < ADC_TEMP_MIN_RECOVERY)
 					StatusChange(gIsChargingBatPos,STATE_NORMAL_CHARGING);
 			}
 			else if(battery_state == STATE_BATTERY_TYPE_ERROR)
@@ -869,7 +869,7 @@ void chargeHandler(void)
 					}
 					PwmControl(PWM_OFF);
 					tempT = getBatTemp(gIsChargingBatPos);
-					if(tempT > ADC_TEMP_MAX && tempT < ADC_TEMP_MIN)
+					if(tempT > ADC_TEMP_MAX_RECOVERY&& tempT < ADC_TEMP_MIN_RECOVERY)
 						StatusChange(gIsChargingBatPos, STATE_NORMAL_CHARGING);
 					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
 				}

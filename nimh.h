@@ -155,8 +155,11 @@ typedef 	 unsigned long		u32;
 #define BAT_REMOVE_VOLT		868
 
 //temperature adc
-#define 	ADC_TEMP_MAX	1148    //48
+#define 	ADC_TEMP_MAX	1203    //50
 #define	ADC_TEMP_MIN	3007	//0
+
+#define ADC_TEMP_MAX_RECOVERY    1509	  //40
+#define ADC_TEMP_MIN_RECOVERY	    2934	 // 2
 
 #elif (LDO_LEVEL == 4000)
 #warning "4v ldo"
@@ -209,7 +212,7 @@ typedef 	 unsigned long		u32;
 #define BAT_ZERO_SPEC_VOLT		2560		// 2.5 (2.5/4*4096) 
 
 //temperature adc
-#define 	ADC_TEMP_MAX	1148    //48
+#define 	ADC_TEMP_MAX	1203    //50
 #define	ADC_TEMP_MIN	3007	//0
 #elif (LDO_LEVEL == 2600)
 #warning "2.6v ldo"
@@ -262,7 +265,7 @@ typedef 	 unsigned long		u32;
 #define BAT_ZERO_SPEC_VOLT		3938		// 2.5 (2.5/2.6*4096) 
 
 //temperature adc
-#define 	ADC_TEMP_MAX	1148    //48
+#define 	ADC_TEMP_MAX	1203    //50
 #define	ADC_TEMP_MIN	3007	//0
 #endif
 
