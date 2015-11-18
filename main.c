@@ -894,6 +894,8 @@ void PickBattery()
 						gIsChargingBatPos = BT_1;
 					else
 						gIsChargingBatPos++;
+					if(gBatStateBuf[gIsChargingBatPos] != STATE_NORMAL_CHARGING)
+						return;
 				}
 			}
 			for(batNum = BT_1; batNum<=BT_4; batNum++)
