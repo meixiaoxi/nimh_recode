@@ -636,7 +636,7 @@ void setCurrent(u8 level)
 	}
 	else if(level == CURRENT_LEVEL_3)  //  200mA   90mA 
 	{
-		P3IO |= 0xFB;   //cur_ctl ‰»Î	
+		P3IO &= 0xFB;   //cur_ctl ‰»Î	
 
 		P3IO |= 0x40;
 		P36 = 0;
