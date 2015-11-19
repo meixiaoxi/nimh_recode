@@ -158,6 +158,8 @@ typedef 	 unsigned long		u32;
 #define 	ADC_TEMP_MAX	1203    //50
 #define	ADC_TEMP_MIN	3177	//-5
 
+#define ADC_TEMP_DOWN_CURRENT  1289	//47
+
 #define ADC_TEMP_MAX_RECOVERY    1509	  //40
 #define ADC_TEMP_MIN_RECOVERY	    3077	 // -2
 

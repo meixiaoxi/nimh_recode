@@ -49,6 +49,7 @@ u8 gDelayCount =0;
 u8 gChargeCount =0;
 u8 gDetectRemovePos=0;
 u8 gHasBat = 0;
+u8 gIsInTempProtect[4] = {0,0,0,0};
 
 extern u8 ledDisplayCount;
 extern u8 gLedStatus;
@@ -302,6 +303,7 @@ void removeBat(u8 batNum)
 	TotalTime[batNum] = 0;
 	LED_OFF(batNum);
 	gBatType[batNum] = 0;
+	gIsInTempProtect[batNum] = 0;
 	//PB &= 0xF0;   //close current pwm channel
 	PwmControl(PWM_OFF);
 
@@ -325,6 +327,7 @@ void removeAllBat()
 	LED_OFF(i);
 	TotalTime[i] = 0;
 	gBatType[i] = 0;
+	gIsInTempProtect[i] = 0;
 	}
 
 	gCurrentLevel[0] = CURRENT_LEVEL_1;
@@ -578,41 +581,13 @@ void FastCharge(u8 batNum)
 
 	if(gChargingTimeTick[batNum] > BAT_START_DV_COUNT)  //hod-off time, in this period, we do NOT detect -dv
 	{
-		#if 0
-		if(preVoltData[batNum])
-		{
-			tempV = ((preVoltData[batNum]<<2) + tempV)/5;
-			preVoltData[batNum] = tempV;
-		}
-		else
-		{
-			preVoltData[batNum] = tempV;
-		}
-		#endif
-
 			if(gBatType[batNum] == BAT_AAA_TYPE)
 				overTimer = BAT_CHARGING_FAST_MAX_COUNT_AAA;
-			if(tempV >= CHARGING_FAST_MAX_VOLT || gChargingTimeTick[batNum] > overTimer || tempT < ADC_TEMP_MAX || tempT > ADC_TEMP_MIN || gNearFullTimeTick[batNum] > BAT_NEAR_FULL_MAX_COUNT)
+			if(gChargingTimeTick[batNum] > overTimer || gNearFullTimeTick[batNum] > BAT_NEAR_FULL_MAX_COUNT)
 			{
-				if((tempT < ADC_TEMP_MAX  && tempV <CHARGING_FAST_TEMP_END_VOLT) || tempT > ADC_TEMP_MIN)   //¹ýÎÂ
-				{
-					//µçÑ¹²»×ã
-					StatusChange(batNum,STATE_BATTERY_TEMPERATURE_ERROR);
-
-					preVoltData[batNum] = 0;
-					gIsInTwoState = 0;
-					return;
-				}
-				fitCount[batNum]++;
-				if(fitCount[batNum] > 3)
-				{
-					 //timer or maxVolt
 					StatusChange(batNum,STATE_BATTERY_FULL);	
 					gChargingTimeTick[batNum] = 0;
-				}
-					return;
 			}
-			fitCount[batNum] = 0;
 
 			if(tempV > gBatVoltArray[batNum])
 			{
@@ -630,9 +605,24 @@ void FastCharge(u8 batNum)
 					{
 						StatusChange(batNum,STATE_BATTERY_FULL);
 						gChargingTimeTick[batNum] = 0;
+						return;
 					}
 				}
 			}
+			 if(tempT < ADC_TEMP_MAX || tempT > ADC_TEMP_MIN)
+			 {
+			 	StatusChange(batNum, STATE_BATTERY_TEMPERATURE_ERROR);
+			 }
+			 else if(tempT < ADC_TEMP_DOWN_CURRENT)
+			 {
+			 	gIsInTempProtect[batNum] = 1;
+			 }
+			 if(gIsInTempProtect[batNum])
+			 {
+			 	if(tempT > ADC_TEMP_MAX_RECOVERY)
+					gIsInTempProtect[batNum] = 0;
+					
+			 }
 	}
 	else
 	{
@@ -713,6 +703,11 @@ void chargeHandler(void)
 				chargeCurrent = CURRENT_LEVEL_2;
 			else
 					chargeCurrent = CURRENT_LEVEL_3;
+			if(gIsInTempProtect[gIsChargingBatPos])
+			{
+				if(chargeCurrent != CURRENT_LEVEL_3)
+					chargeCurrent++;
+			}
 			if(gChargeChildStatus[gIsChargingBatPos] == CHARGE_STATE_PRE)
 				chargeCurrent = CURRENT_LEVEL_3;
 		}
