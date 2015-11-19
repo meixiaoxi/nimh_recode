@@ -156,10 +156,10 @@ typedef 	 unsigned long		u32;
 
 //temperature adc
 #define 	ADC_TEMP_MAX	1203    //50
-#define	ADC_TEMP_MIN	3007	//0
+#define	ADC_TEMP_MIN	3177	//-5
 
 #define ADC_TEMP_MAX_RECOVERY    1509	  //40
-#define ADC_TEMP_MIN_RECOVERY	    2934	 // 2
+#define ADC_TEMP_MIN_RECOVERY	    3077	 // -2
 
 
 //output temp
@@ -221,7 +221,7 @@ typedef 	 unsigned long		u32;
 
 //temperature adc
 #define 	ADC_TEMP_MAX	1203    //50
-#define	ADC_TEMP_MIN	3007	//0
+#define	ADC_TEMP_MIN	3177	//-5
 #elif (LDO_LEVEL == 2600)
 #warning "2.6v ldo"
 
@@ -274,7 +274,7 @@ typedef 	 unsigned long		u32;
 
 //temperature adc
 #define 	ADC_TEMP_MAX	1203    //50
-#define	ADC_TEMP_MIN	3007	//0
+#define	ADC_TEMP_MIN	3177	//-5
 #endif
 
 #if 0
