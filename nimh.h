@@ -90,7 +90,6 @@ typedef 	 unsigned long		u32;
 #define ADC_DV_VOLT						6			//5mv   0.005/3.3*4096
 
 #define BAT_HAS_BATTERY_VOLT			868		// 0.7  (0.7/3.3)*4096
-#define BAT_REVERSE_VOLT				124		// 0.1  (0.1/3.3)*4096
 
 #define BAT_MIN_VOLT_33_OPEN	472		//(0.3/2.6)*4096
 #define BAT_MIN_VOLT_OPEN	372 			//(0.3/3.3)*4096

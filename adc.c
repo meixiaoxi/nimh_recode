@@ -3,7 +3,6 @@
 //u8 tempStr2[] = "temp2:";
 
 extern u16 gChargeCurrent;
-extern u8 isReverseBat;
 u16 getAdcValue(u8 channel)
 {
 	
@@ -138,9 +137,6 @@ u16 getVbatAdc(u8 channel)
 
 	if(tempV < gChargeCurrent)
 	{
-		if((gChargeCurrent - tempV) > BAT_REVERSE_VOLT)
-			isReverseBat = 1;
-
 		gChargeCurrent = 0;
 		return 0;
 	}
