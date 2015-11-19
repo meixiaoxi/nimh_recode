@@ -49,6 +49,7 @@ u8 gDelayCount =0;
 u8 gChargeCount =0;
 u8 gDetectRemovePos=0;
 u8 gHasBat = 0;
+u8 isReverseBat = 0;
 	
 extern u8 ledDisplayCount;
 extern u8 gLedStatus;
@@ -709,7 +710,10 @@ void chargeHandler(void)
 			if(battery_state == STATE_DEAD_BATTERY)
 			{
 				gHasBat = 0;
+				isReverseBat = 0;
 				tempV = getVbatAdc(gIsChargingBatPos);
+				if(isReverseBat)
+					return;
 				if(tempV >= BAT_MAX_VOLT_OPEN)
 				{
 					StatusChange(gIsChargingBatPos, STATE_BATTERY_TYPE_ERROR);
