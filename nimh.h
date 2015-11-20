@@ -36,7 +36,10 @@ typedef 	 unsigned long		u32;
 #define SYS_DISCHARGE_STATE	0x04
 #endif
 
-
+#define toNextBattery()	if(gIsChargingBatPos >= BT_4)\
+			gIsChargingBatPos = BT_1;\
+		else\
+			gIsChargingBatPos++;\
 
 
 #define STATE_DEAD_BATTERY 							0
