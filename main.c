@@ -485,7 +485,7 @@ void PreCharge(u8 batNum)
 		
 		if(gChargingTimeTick[batNum] > BAT_CHARGING_PRE_MAX_COUNT)
 		{
-			StatusChange(batNum,STATE_ZERO_BATTERY_CHARGE_ERROR);
+			StatusChange(batNum,STATE_BATTERY_TYPE_ERROR);
 		}
 		else
 		{ 
@@ -501,7 +501,7 @@ void PreCharge(u8 batNum)
 				tempT = getBatTemp(batNum);
 				if(tempT < ADC_TEMP_MAX || tempT > ADC_TEMP_MIN)
 				{
-					StatusChange(batNum,STATE_ZERO_BATTERY_TEMPERATURE_ERROR);
+					StatusChange(batNum,STATE_BATTERY_TEMPERATURE_ERROR);
 					gChargingTimeTick[batNum] = 0;
 				}
 			}
@@ -713,11 +713,6 @@ void chargeHandler(void)
 			if(gChargeChildStatus[gIsChargingBatPos] == CHARGE_STATE_PRE)
 				chargeCurrent = CURRENT_LEVEL_3;
 		}
-		else if(battery_state == STATE_ZERO_BATTERY_TEMPERATURE_ERROR || battery_state == STATE_ZERO_BATTERY_CHARGE_ERROR)
-		{
-			chargingTime = CHARGING_TIME_10MS;
-			chargeCurrent = CURRENT_LEVEL_3;
-		}
 		else if(battery_state == STATE_BATTERY_TYPE_ERROR)
 		{
 			chargingTime = CHARGING_TIME_0MS;
@@ -825,10 +820,7 @@ void chargeHandler(void)
 
 							if(tempT < ADC_TEMP_MAX || tempT > ADC_TEMP_MIN)
 							{
-								if(gChargeChildStatus[gIsChargingBatPos] == CHARGE_STATE_PRE)
-									StatusChange(gIsChargingBatPos,STATE_ZERO_BATTERY_TEMPERATURE_ERROR);
-								else
-									StatusChange( gIsChargingBatPos,STATE_BATTERY_TEMPERATURE_ERROR);
+								StatusChange( gIsChargingBatPos,STATE_BATTERY_TEMPERATURE_ERROR);
 							}
 							gChargingTimeTick[gIsChargingBatPos] = 0;
 							gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
@@ -924,22 +916,6 @@ void chargeHandler(void)
 						}
 					}
 					gPreChargingBatPos = gIsChargingBatPos;
-					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
-				}
-				else if(battery_state == STATE_ZERO_BATTERY_TEMPERATURE_ERROR)
-				{
-					tempV = getVbatAdc(gIsChargingBatPos);
-					if(tempV > BAT_ZERO_SPEC_VOLT)
-					{
-						StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
-						PwmControl(PWM_OFF);
-						gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
-						return;
-					}
-					PwmControl(PWM_OFF);
-					tempT = getBatTemp(gIsChargingBatPos);
-					if(tempT > ADC_TEMP_MAX_RECOVERY&& tempT < ADC_TEMP_MIN_RECOVERY)
-						StatusChange(gIsChargingBatPos, STATE_NORMAL_CHARGING);
 					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 				}
 				else if(battery_state == STATE_BATTERY_FULL)

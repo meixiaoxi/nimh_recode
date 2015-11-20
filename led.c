@@ -63,7 +63,7 @@ if(gSysStatus == SYS_CHARGING_STATE)
 	{
 		for(i=BT_1;i<=BT_4;i++)
 		{
-			if(gBatStateBuf[i] == STATE_NORMAL_CHARGING ||gBatStateBuf[i] == STATE_BATTERY_FULL || gBatStateBuf[i] == STATE_BATTERY_DETECT)
+			if(gBatStateBuf[i] == STATE_NORMAL_CHARGING ||gBatStateBuf[i] == STATE_BATTERY_FULL)
 				LED_ON(i);
 		}
 		ledDisplayCount++;
@@ -77,7 +77,7 @@ if(gSysStatus == SYS_CHARGING_STATE)
 	{
 		for(i=BT_1;i<=BT_4;i++)
 		{
-			if(gBatStateBuf[i] == STATE_NORMAL_CHARGING || gBatStateBuf[i] == STATE_DEAD_BATTERY || gBatStateBuf[i] == STATE_BATTERY_DETECT)
+			if(gBatStateBuf[i] == STATE_NORMAL_CHARGING || gBatStateBuf[i] == STATE_DEAD_BATTERY)
 				LED_OFF(i);		
 		}
 		ledDisplayCount++;
@@ -94,7 +94,7 @@ if(gSysStatus == SYS_CHARGING_STATE)
 	{
 		for(i=BT_1;i<=BT_4;i++)
 		{
-			if((gBatStateBuf[i] >= STATE_BATTERY_TYPE_ERROR) && (gBatStateBuf[i] <= STATE_ZERO_BATTERY_CHARGE_ERROR))
+			if(gBatStateBuf[i] == STATE_BATTERY_TYPE_ERROR ||gBatStateBuf[i] == STATE_BATTERY_TEMPERATURE_ERROR)
 			{
 				LED_ON(i);	
 			}
@@ -110,7 +110,7 @@ if(gSysStatus == SYS_CHARGING_STATE)
 	{
 		for(i=BT_1;i<=BT_4;i++)
 		{
-			if((gBatStateBuf[i]>=STATE_BATTERY_TYPE_ERROR) && (gBatStateBuf[i]<=STATE_ZERO_BATTERY_CHARGE_ERROR))
+			if(gBatStateBuf[i] == STATE_BATTERY_TYPE_ERROR ||gBatStateBuf[i] == STATE_BATTERY_TEMPERATURE_ERROR)
 				LED_OFF(i);		
 		}
 		ledErrorCount++;
