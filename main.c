@@ -305,7 +305,8 @@ void removeBat(u8 batNum)
 	gBatType[batNum] = 0;
 	gIsInTempProtect[batNum] = 0;
 	//PB &= 0xF0;   //close current pwm channel
-	PwmControl(PWM_OFF);
+	if(batNum == gIsChargingBatPos)
+		PwmControl(PWM_OFF);
 
 	gPreChargingBatPos = BT_NULL;
 	gIsInTwoState = 0;
@@ -997,31 +998,20 @@ void PickBattery()
 void btRemove()
 {
 	u16 tempV;
+	u8 batNum;
 
-	if(gIsChargingBatPos == gDetectRemovePos)
+	for(batNum = BT_1; batNum<= BT_4; batNum++)
 	{
-		if(gDetectRemovePos >= BT_4)
-			gDetectRemovePos = BT_1;
-		else
-			gDetectRemovePos++;
-	}
-
-	if(gBatStateBuf[gDetectRemovePos] >= STATE_NORMAL_CHARGING && gBatStateBuf[gDetectRemovePos] <=STATE_BATTERY_TEMPERATURE_ERROR)
-	{	
-		if(gChargeChildStatus[gDetectRemovePos] == CHARGE_STATE_FAST)
-		{
-			tempV = getVbatAdc(gDetectRemovePos);
-			if(tempV < BAT_REMOVE_VOLT)
+		if(gBatStateBuf[batNum] != STATE_DEAD_BATTERY)
+		{	
+			tempV = getVbatAdc(batNum);
+			if(tempV < BAT_REMOVE_VOLT || tempV > BAT_ZERO_SPEC_VOLT) //0 or BAT_ZERO_SPEC_VOLT for the charing battery
 			{
-				StatusChange(gDetectRemovePos,STATE_DEAD_BATTERY);
+				StatusChange(batNum,STATE_DEAD_BATTERY);
 			}
 		}
 	}
 
-	if(gDetectRemovePos >= BT_4)
-		gDetectRemovePos = BT_1;
-	else
-		gDetectRemovePos++;
 }
 
 
