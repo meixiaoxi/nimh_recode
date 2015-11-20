@@ -134,8 +134,8 @@ do
 {
 	if(gOutputStatus != OUTPUT_STATUS_STOP)
 	{
-		gDelayCount++;
-		if(gDelayCount> 49)
+		//gDelayCount++;
+		//if(gDelayCount> 49)
 		{
 			gDelayCount=0;
 		//	if(gOutputStatus == OUTPUT_STATUS_WAIT)
