@@ -40,7 +40,7 @@ u8 idata gNowTwoBuf[2];
 
 u8 RestTime[4] = {0,0,0,0};
 u8 gIsChargingBatPos=BT_NULL;
-u8 gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+u8 gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 u8 gChargeChildStatus[4] = {0,0,0,0};
 u16 gChargeCurrent_2;
 u16 gChargeCurrent;
@@ -308,7 +308,8 @@ void removeBat(u8 batNum)
 	if(batNum == gIsChargingBatPos)
 		PwmControl(PWM_OFF);
 
-	gPreChargingBatPos = BT_NULL;
+	if(batNum == gPreChargingBatPos)
+		gPreChargingBatPos = BT_NULL;
 	gIsInTwoState = 0;
 }
 
@@ -362,7 +363,7 @@ void StatusCheck()
 					//remove all bat
 					removeAllBat();
 					isFromOutput = 0;
-					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 					gDelayCount = 50;
 					skipCount = 0;
 				}
@@ -679,7 +680,7 @@ void chargeHandler(void)
 	static u8 chargingTime = 0;
 	u8 chargeCurrent = 0,temp_3;
 
-	if(gChargingStatus == SYS_CHARGING_STATUS_DETECT)
+	if(gChargingStatus == SYS_CHARGE_WAIT_TO_PICK_BATTERY)
 	{
 		if(battery_state == STATE_DEAD_BATTERY)
 		{
@@ -755,7 +756,7 @@ void chargeHandler(void)
 			setCurrent(chargeCurrent);
 			#endif
 			PwmControl(PWM_ON);
-			gChargingStatus = SYS_CHARGING_STATUS_NORMAL;
+			gChargingStatus = SYS_CHARGE_IS_CHARGING;
 			gDelayCount =0;
 			gChargeCount =0;
 		}
@@ -777,7 +778,7 @@ void chargeHandler(void)
 			}
 		}
 	}
-	else if(gChargingStatus == SYS_CHARGING_STATUS_NORMAL)
+	else if(gChargingStatus == SYS_CHARGE_IS_CHARGING)
 	{
 		if(chargingTime != 0)
 		{
@@ -794,7 +795,7 @@ void chargeHandler(void)
 					{
 						StatusChange(gIsChargingBatPos,STATE_BATTERY_TYPE_ERROR);
 					}
-					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 				}
 				else if(battery_state == STATE_BATTERY_DETECT)
 				{
@@ -804,7 +805,7 @@ void chargeHandler(void)
 						batteryDetect(gIsChargingBatPos,tempV);
 						if(gBatStateBuf[gIsChargingBatPos] == STATE_BATTERY_TYPE_ERROR)
 						{
-							gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+							gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 						}
 						gDelayCount= 0;
 					}
@@ -830,7 +831,7 @@ void chargeHandler(void)
 									StatusChange( gIsChargingBatPos,STATE_BATTERY_TEMPERATURE_ERROR);
 							}
 							gChargingTimeTick[gIsChargingBatPos] = 0;
-							gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+							gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 						}
 					}
 						
@@ -842,7 +843,7 @@ void chargeHandler(void)
 					{
 						StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
 						PwmControl(PWM_OFF);
-						gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+						gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 						return;
 					}
 					
@@ -881,7 +882,7 @@ void chargeHandler(void)
 							{
 								PwmControl(PWM_OFF);
 								StatusChange(gIsChargingBatPos,STATE_BATTERY_TYPE_ERROR);
-								gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+								gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 								return;
 							}
 						}
@@ -923,7 +924,7 @@ void chargeHandler(void)
 						}
 					}
 					gPreChargingBatPos = gIsChargingBatPos;
-					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 				}
 				else if(battery_state == STATE_ZERO_BATTERY_TEMPERATURE_ERROR)
 				{
@@ -932,24 +933,24 @@ void chargeHandler(void)
 					{
 						StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
 						PwmControl(PWM_OFF);
-						gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+						gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 						return;
 					}
 					PwmControl(PWM_OFF);
 					tempT = getBatTemp(gIsChargingBatPos);
 					if(tempT > ADC_TEMP_MAX_RECOVERY&& tempT < ADC_TEMP_MIN_RECOVERY)
 						StatusChange(gIsChargingBatPos, STATE_NORMAL_CHARGING);
-					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 				}
 				else if(battery_state == STATE_BATTERY_FULL)
 				{
 					PwmControl(PWM_OFF);
-					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 				}
 				else
 				{
 					PwmControl(PWM_OFF);
-					gChargingStatus = SYS_CHARGING_STATUS_DETECT;
+					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 				}
 			}
 		}
@@ -1008,6 +1009,10 @@ void btRemove()
 			if(tempV < BAT_REMOVE_VOLT || tempV > BAT_ZERO_SPEC_VOLT) //0 or BAT_ZERO_SPEC_VOLT for the charing battery
 			{
 				StatusChange(batNum,STATE_DEAD_BATTERY);
+				if(batNum == gIsChargingBatPos)
+				{
+					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
+				}
 			}
 		}
 	}
@@ -1246,7 +1251,7 @@ void main()
 		{
 			btRemove();
 
-			if(gChargingStatus != SYS_CHARGING_STATUS_NORMAL)
+			if(gChargingStatus == SYS_CHARGE_WAIT_TO_PICK_BATTERY)
 				PickBattery();
 
 			chargeHandler();
