@@ -7,8 +7,8 @@ typedef  unsigned char		u8;
 typedef	 unsigned short 		u16;		
 typedef 	 unsigned long		u32;
 
-#define EVT_BOARD
-//#define DVT_BOARD
+//#define EVT_BOARD
+#define DVT_BOARD
 
 #define GET_FACTORY_STATUS()	(P2&0x20)
 
@@ -161,6 +161,10 @@ typedef 	 unsigned long		u32;
 #define BAT_START_FAST_CHARGE		1750		// 1.41  1.41/3.3*4096
 
 #define BAT_REMOVE_VOLT		868
+
+
+#define TEST_VOLT_YUNFANG_MIN		3227			// 2.6 (2.6/3.3*4096)
+#define TEST_VOLT_YUNFANG_MAX	3723				// 3  (3/3.3*4096)
 
 //temperature adc
 #define 	ADC_TEMP_MAX	1203    //50

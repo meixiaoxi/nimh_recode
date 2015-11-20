@@ -995,6 +995,7 @@ void btRemove()
 //¹¤³§²âÊÔ
 void factoryTest()
 {
+	u8 testlevel = 1;
 	gDetectRemovePos = 1;
 
 	gSysStatus = GET_SYS_STATUS();
@@ -1005,11 +1006,34 @@ void factoryTest()
 	}
 	
 do{
-	gBatVoltArray[0] = getAdcValue(CHANNEL_VIN_5V);
+	gBatVoltArray[0] = getAverage(CHANNEL_VIN_5V);
 	if(gBatVoltArray[0] > VIN_5V_TEST_MAX || gBatVoltArray[0] < VIN_5V_TEST_MIN)
 		break;
-
+	
 	gDetectRemovePos++;
+
+	gBatVoltArray[0] = getBatTemp(BT_1);
+	if(gBatVoltArray[0] > 2172  || gBatVoltArray[0]  < 1923)  // 1.65 +/- 0.1V
+		break;
+	gDetectRemovePos++;
+	gBatVoltArray[0] = getBatTemp(BT_3);
+	if(gBatVoltArray[0] > 2172  || gBatVoltArray[0]  < 1923)
+		break;
+	gDetectRemovePos++;
+
+// 2.8V ok?
+	gIsChargingBatPos = BT_1;
+	P0IO &= 0xFB;  //set chg_dischg to output
+	P02 = 0;   //output 0 to lwo mos
+	PwmControl(PWM_ON);
+	delay_ms(10);
+	gBatVoltArray[0] = getVbatAdc(BT_1);
+	if(gBatVoltArray[0] > TEST_VOLT_YUNFANG_MAX|| gBatVoltArray[0] < TEST_VOLT_YUNFANG_MIN)  // 2.8 +/- 0.2
+		break;
+	gDetectRemovePos++;
+
+	P0IO |= 0x04;  //set chg_dischg to input
+	gIsChargingBatPos = 1;
 	
 	for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 	{
@@ -1020,14 +1044,45 @@ do{
 			}
 		}
 		ClrWdt();
+		#if 0
 		gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
 		if(gBatVoltArray[gIsChargingBatPos] >1923 || gBatVoltArray[gIsChargingBatPos] < 1799 )
 		{
 			fitCount[gIsChargingBatPos] =1;
 			continue;
 		}
-		//gDetectRemovePos++;
+		//gDetectRemovePos++;	
+		#endif
+		do{
+		setCurrent(testlevel);
 		PwmControl(PWM_ON);
+		delay_ms(100);
+		if(testlevel == 1)
+		{
+			gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
+			if(gBatVoltArray[gIsChargingBatPos] >1923 || gBatVoltArray[gIsChargingBatPos] < 1799 )
+			{
+				fitCount[gIsChargingBatPos] =1;
+			}
+		}
+		else if(testlevel == 2)
+		{
+		}
+		else
+		{
+			
+		}
+		testlevel++;
+		}while(testlevel<= CURRENT_LEVEL_3);
+		
+	}
+
+	//
+	gIsChargingBatPos = 1;
+	setCurrent(CURRENT_LEVEL_1);	
+	PwmControl(PWM_ON);
+	delay_ms(100);
+	gBatVoltArray[0] = getBatTemp(BT_1);
 		delay_ms(700);
 		gBatVoltArray[gIsChargingBatPos]= getVbatAdc(gIsChargingBatPos);
 		if(gChargeCurrent < 10 || gChargeCurrent > 23)
@@ -1035,7 +1090,10 @@ do{
 			fitCount[gIsChargingBatPos] = 2;
 		}
 		//gDetectRemovePos++;
-		PwmControl(PWM_OFF);
+		PwmControl(PWM_OFF);		
+	
+	for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
+	{	
 	}
 }while(0);
 
@@ -1058,7 +1116,11 @@ do{
 			{
 				if(skipCount)
 				{
-					if(fitCount[gIsChargingBatPos] !=0 || gDetectRemovePos <=1)
+					if(fitCount[gIsChargingBatPos] !=0 || gDetectRemovePos <=3)  // >3 means vin5V and NTC both ok
+					{
+						LED_ON(gIsChargingBatPos);
+					}
+					else
 					{
 						LED_OFF(gIsChargingBatPos);
 					}
@@ -1128,7 +1190,7 @@ void InitConfig()
     #else  //DVT BOARD
     					  //7     6      5      4             3               2                 1             0
        				  //-     -      -      -      Vin5V_DET   CHG_DISCHG    NTC2     led3         
-    P0IO    = 0xF5;         // out     out    out     out        input              out           input       out                 (0:input   1:output)
+    P0IO    = 0xF1;         // out     out    out     out        input              input           input       out                 (0:input   1:output)
     P0OD    = 0x00;        // -      pp     pp      pp            PP                PP               pp            pp                    (0:push-pull   1:open-drain)
     P0PU    = 0x70;         // -      on      on       on           off                off             off           off                  (0:disable      1:enable)               
     P0        = 0x01;	        // -      -       -         -              0              0                0               1
