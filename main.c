@@ -63,11 +63,6 @@ void FindTwoBattery()
 		{
 			if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING && gBatVoltArray[batNum]>= BAT_START_FAST_CHARGE)// CHARGE_STATE_ERROR | BAT_TYPE_ERROR | CHARGE_STATE_FULL
 			{
-				if(gChargeChildStatus[batNum] == CHARGE_STATE_PRE)
-				{
-					gIsInTwoState = 0;
-					return;
-				}
 				if(fitNum == 2)
 				{
 					if(gBatVoltArray[batNum] > gBatVoltArray[gNowTwoBuf[1]])	
@@ -938,7 +933,7 @@ void addRestTime()
 u8 batNum;	
 			for(batNum = BT_1; batNum<=BT_4; batNum++)
 			{
-				if(batNum == gIsChargingBatPos)
+				if(batNum == gIsChargingBatPos || gBatStateBuf[batNum] == STATE_DEAD_BATTERY)
 					continue;
 				
 				RestTime[batNum]++;
