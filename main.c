@@ -977,7 +977,7 @@ void btRemove()
 		if(gBatStateBuf[batNum] != STATE_DEAD_BATTERY)
 		{	
 			tempV = getVbatAdc(batNum);
-			if(tempV < BAT_REMOVE_VOLT || tempV > BAT_ZERO_SPEC_VOLT) //0 or BAT_ZERO_SPEC_VOLT for the charing battery
+			if(tempV < BAT_MIN_VOLT_OPEN_SPE || tempV > BAT_ZERO_SPEC_VOLT) //0 or BAT_ZERO_SPEC_VOLT for the charing battery
 			{
 				StatusChange(batNum,STATE_DEAD_BATTERY);
 				if(batNum == gIsChargingBatPos)
