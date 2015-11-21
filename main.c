@@ -971,7 +971,7 @@ void PickBattery()
 
 void btRemove()
 {
-	u16 tempV,tempSpe;
+	u16 tempV;
 	u8 batNum;
 
 	for(batNum = BT_1; batNum<= BT_4; batNum++)
@@ -979,11 +979,8 @@ void btRemove()
 		if(gBatStateBuf[batNum] != STATE_DEAD_BATTERY)
 		{	
 			tempV = getVbatAdc(batNum);
-			if(batNum != BT_1)
-				tempSpe = BAT_MIN_VOLT_OPEN_SPE;
-			else
-				tempSpe = 868;
-			if(tempV < tempSpe || tempV > BAT_ZERO_SPEC_VOLT) //0 or BAT_ZERO_SPEC_VOLT for the charing battery
+
+			if(tempV < BAT_MIN_VOLT_OPEN_SPE || tempV > BAT_ZERO_SPEC_VOLT) //0 or BAT_ZERO_SPEC_VOLT for the charing battery
 			{
 				StatusChange(batNum,STATE_DEAD_BATTERY);
 				if(batNum == gIsChargingBatPos)
