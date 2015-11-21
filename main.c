@@ -146,18 +146,18 @@ do
 			else
 				temp_min = MIN_VBAT_OUTPUT_IDLE;
 
-			for(cur_detect_pos = BT_1; cur_detect_pos <=BT_4; cur_detect_pos++)
-			{
-				preVoltData[cur_detect_pos] = getVbatAdc(cur_detect_pos);
-				#ifdef EVT_BOARD
-				if(cur_detect_pos == BT_4 || cur_detect_pos == BT_3)
-					preVoltData[cur_detect_pos] = preVoltData[cur_detect_pos]/3;
-				#else
-				if(cur_detect_pos == BT_4)
-					preVoltData[cur_detect_pos] = preVoltData[cur_detect_pos]/3;
-				#endif
+			preVoltData[BT_1] = getAverage(CHANNEL_VBAT_1);
+			preVoltData[BT_2] = getAverage(CHANNEL_VBAT_2);
+			preVoltData[BT_3] = getAverage(CHANNEL_VBAT_3);
+			preVoltData[BT_4] = getAverage(CHANNEL_VBAT_4);
 
-			}
+			#ifdef EVT_BOARD
+			preVoltData[BT_3] = preVoltData[BT_3] /3;
+			preVoltData[BT_4] = preVoltData[BT_4] /3;
+			#else
+			preVoltData[BT_4] = preVoltData[BT_4] /3;
+			#endif
+
 			for(cur_detect_pos = BT_1; cur_detect_pos <BT_4; cur_detect_pos++)
 			{
 				if(preVoltData[cur_detect_pos+1] > preVoltData[cur_detect_pos])
