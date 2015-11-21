@@ -31,7 +31,7 @@ u32 idata gChargingTimeTick[4] ={0,0,0,0};
 //u32 idata gLastChangeLevelTick[4]= {0,0,0,0};
 //u8   idata gIsFisrtChangeLevel[4] = {0,0,0,0};
 
-u8 idata gCurrentLevel[2] = {1,1};
+u8 idata gCurrentLevel[2] = {CURRENT_LEVEL_3,CURRENT_LEVEL_3};
 u8 idata gCurrentNow = 1;
 u8 idata gIsInTwoState= 0;
 u8 idata gNowTwoBuf[2];
@@ -50,6 +50,7 @@ u8 gChargeCount =0;
 u8 gDetectRemovePos=0;
 u8 gHasBat = 0;
 u8 gIsInTempProtect[4] = {0,0,0,0};
+u8 tryUpDnCurrent[2] = {UP_CURRENT,UP_CURRENT};
 
 extern u8 ledDisplayCount;
 extern u8 gLedStatus;
@@ -182,7 +183,7 @@ do
 						gBatStateBuf[0] = 1;
 				}	
 			}
-
+			
 			if(skipCount == 0)  //ÎÂ¶ÈÕý³£
 			{
 				temp_min = getBatTemp(BT_1);
@@ -327,8 +328,10 @@ void removeAllBat()
 	gIsInTempProtect[i] = 0;
 	}
 
-	gCurrentLevel[0] = CURRENT_LEVEL_1;
-	gCurrentLevel[1] = CURRENT_LEVEL_1;
+	gCurrentLevel[0] = CURRENT_LEVEL_3;
+	gCurrentLevel[1] = CURRENT_LEVEL_3;
+	tryUpDnCurrent[0] = UP_CURRENT;
+	tryUpDnCurrent[1] = UP_CURRENT;
 
 	setCurrent(CURRENT_LEVEL_1);
 	
@@ -361,6 +364,7 @@ void StatusCheck()
 					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 					gDelayCount = 50;
 					skipCount = 0;
+					gHasBat = 0;
 				}
 			}
 			else
@@ -828,6 +832,10 @@ void chargeHandler(void)
 							tempT = getBatTemp(gIsChargingBatPos);
 							gBatVoltArray[gIsChargingBatPos] = tempV;
 							StatusChange(gIsChargingBatPos, STATE_NORMAL_CHARGING);
+							gCurrentLevel[0] = CURRENT_LEVEL_3;
+							gCurrentLevel[1] = CURRENT_LEVEL_3;
+							tryUpDnCurrent[0] = UP_CURRENT;
+							tryUpDnCurrent[1] = UP_CURRENT;
 							if(tempV< CHARGING_PRE_END_VOLT )
 								gChargeChildStatus[gIsChargingBatPos] =  CHARGE_STATE_PRE;
 							else
@@ -894,21 +902,29 @@ void chargeHandler(void)
 							}
 						}
 						#ifdef DVT_BOARD
+						if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
+							temp_3 = 0;
+						else
+							temp_3 = 1;
+							
 						temp_2 = getAverage(CHANNEL_VIN_5V);
 						if(temp_2 < VIN_5V_MINUM)
 						{
 							temp_2 = getAverage(CHANNEL_VIN_5V);
 							if(temp_2 < VIN_5V_MINUM)
 							{
-								if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
+								if(gCurrentLevel[temp_3] < CURRENT_LEVEL_3)
+									gCurrentLevel[temp_3]++;
+								tryUpDnCurrent[temp_3] = DN_CURRENT;
+							}
+						}
+						else
+						{
+							if(tryUpDnCurrent[temp_3] == UP_CURRENT)
+							{
+								if(gCurrentLevel[temp_3] > CURRENT_LEVEL_1)
 								{
-									if(gCurrentLevel[0] < CURRENT_LEVEL_3)
-										gCurrentLevel[0]++;
-								}
-								else
-								{
-									if(gCurrentLevel[1] < CURRENT_LEVEL_3)
-										gCurrentLevel[1]++;
+									gCurrentLevel[temp_3]--;
 								}
 							}
 						}
@@ -1285,6 +1301,7 @@ void main()
 	{
 		gOutputStatus = OUTPUT_STATUS_WAIT;
 		gDelayCount = 50;
+		gHasBat = 0;
 		CHANGE_TO_OUTPUT();
 	}
 	delay_ms(100);

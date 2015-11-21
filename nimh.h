@@ -83,6 +83,10 @@ typedef 	 unsigned long		u32;
 #define BT_4		3
 #define BT_NULL	4
 
+
+#define UP_CURRENT		0
+#define DN_CURRENT		1
+
 #define PWM_ON	1
 #define PWM_OFF	 0
 
@@ -139,8 +143,8 @@ typedef 	 unsigned long		u32;
 
 //output
 #define MIN_VBAT_CHANNEL_1_IDLE	 1944  //(4.7/3=2.4V   2.4/3.3*4096)
-#define MIN_VBAT_OUPUT				413	//(1/3=0.5	0.5/3.3*4096)
-#define MIN_VBAT_OUTPUT_IDLE		488	// (1.18/3 = 0.41  0.65/3.3*4096)
+#define MIN_VBAT_OUPUT				372	//(1/3=0.5	0.5/3.3*4096)
+#define MIN_VBAT_OUTPUT_IDLE		508	// (1.23/3 = 0.41  0.65/3.3*4096)
 #define	OUTPUT_SHOW_LEVEL_3		537	//(1.3/3  0.65/3.3*4096 )
 #define	OUTPUT_SHOW_LEVEL_2		517	//(1.25/3 0.625/3.3*4096)	
 
