@@ -668,6 +668,24 @@ void setCurrent(u8 level)
 	}
 	gCurrentNow = level;
 }
+
+
+void PreChargeBatHandler()
+{
+	if(RestTime[gPreChargingBatPos] > MIN_DETECT_PRE_BATTERY && isPwmOn == 0)
+	{
+		switch(gChargeChildStatus[gPreChargingBatPos])
+		{
+			case CHARGE_STATE_FAST:
+				FastCharge(gPreChargingBatPos);break;
+			case CHARGE_STATE_PRE:
+				PreCharge(gPreChargingBatPos);break;
+			default:
+				break;
+		}
+		gPreChargingBatPos = BT_NULL;
+	}	
+}
 void chargeHandler(void)
 {
 	u16 tempT,tempV,temp_2;
@@ -684,12 +702,12 @@ void chargeHandler(void)
 		}
 		else if(battery_state == STATE_BATTERY_DETECT)
 		{
-			chargingTime = CHARGING_TIME_500MS;
+			chargingTime = CHARGING_TIME_200MS;
 			chargeCurrent = CURRENT_LEVEL_1;
 		}
 		else if(battery_state == STATE_NORMAL_CHARGING)
 		{
-			chargingTime = CHARGING_TIME_500MS;
+			chargingTime = CHARGING_TIME_200MS;
 			if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
 				temp_3 = 0;
 			else
@@ -897,21 +915,12 @@ void chargeHandler(void)
 						#endif
 					}
 					PwmControl(PWM_OFF);
-					gDelayCount++;
-					if(gDelayCount < 2)
-						return;
-					if(gPreChargingBatPos<=BT_4)
+					if(gPreChargingBatPos != BT_NULL)  //wait for Pre battery detect finish
 					{
-						switch(gChargeChildStatus[gPreChargingBatPos])
-						{
-							case CHARGE_STATE_FAST:
-								FastCharge(gPreChargingBatPos);break;
-							case CHARGE_STATE_PRE:
-								PreCharge(gPreChargingBatPos);break;
-							default:
-								break;
-						}
+						gDelayCount = 1;
+						return;
 					}
+					
 					gPreChargingBatPos = gIsChargingBatPos;
 					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 				}
@@ -960,7 +969,7 @@ void PickBattery()
 				}
 			}
 			
-			if(RestTime[gIsChargingBatPos] >= 48)
+			if(RestTime[gIsChargingBatPos] >= 18)
 				RestTime[gIsChargingBatPos] = 0;
 			else
 				toNextBattery();
@@ -1285,13 +1294,16 @@ void main()
 		
 		if(gSysStatus == SYS_CHARGING_STATE)
 		{
+			addRestTime();
 			btRemove();
 
 			if(gChargingStatus == SYS_CHARGE_WAIT_TO_PICK_BATTERY)
 				PickBattery();
 
 			chargeHandler();
-			addRestTime();	
+
+			if(gPreChargingBatPos < BT_NULL)
+				PreChargeBatHandler();
 		}
 		else    //output handler
 		{
