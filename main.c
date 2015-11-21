@@ -944,7 +944,7 @@ void addRestTime()
 u8 batNum;	
 			for(batNum = BT_1; batNum<=BT_4; batNum++)
 			{
-				if(batNum == gIsChargingBatPos || gBatStateBuf[batNum] == STATE_DEAD_BATTERY)
+				if(((batNum == gIsChargingBatPos) && (isPwmOn == 1)) || gBatStateBuf[batNum] == STATE_DEAD_BATTERY)
 					continue;
 				
 				RestTime[batNum]++;
