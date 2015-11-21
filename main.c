@@ -894,10 +894,10 @@ void chargeHandler(void)
 							}
 						}
 						#ifdef DVT_BOARD
-						temp_2 = getAdcValue(CHANNEL_VIN_5V);
+						temp_2 = getAverage(CHANNEL_VIN_5V);
 						if(temp_2 < VIN_5V_MINUM)
 						{
-							temp_2 = getAdcValue(CHANNEL_VIN_5V);
+							temp_2 = getAverage(CHANNEL_VIN_5V);
 							if(temp_2 < VIN_5V_MINUM)
 							{
 								if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
