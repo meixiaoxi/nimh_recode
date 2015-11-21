@@ -963,9 +963,11 @@ void PickBattery()
 			{
 				while(gNowTwoBuf[0] != gIsChargingBatPos && gNowTwoBuf[1] != gIsChargingBatPos)
 				{
-					toNextBattery();
 					if(gBatStateBuf[gIsChargingBatPos] != STATE_NORMAL_CHARGING)
 						return;
+					if(gIsChargingBatPos == BT_1)  //we can't detect whether BT_1 exist by zero volt 
+						break;
+					toNextBattery();
 				}
 			}
 			
