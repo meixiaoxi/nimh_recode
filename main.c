@@ -1151,16 +1151,18 @@ do{
 
 // 2.8V ok?
 	gIsChargingBatPos = BT_1;
-	P0IO &= 0xFB;  //set chg_dischg to output
-	P02 = 0;   //output 0 to lwo mos
+	P0IO |= 0x04;  //set chg_dischg to output
+	P02 = 1;   //output 0 to lwo mos
 	PwmControl(PWM_ON);
 	delay_ms(10);
+
 	gBatVoltArray[0] = getVbatAdc(BT_1);
+	PwmControl(PWM_OFF);
 	if(gBatVoltArray[0] > TEST_VOLT_YUNFANG_MAX|| gBatVoltArray[0] < TEST_VOLT_YUNFANG_MIN)  // 2.8 +/- 0.2
 		break;
 	gDetectRemovePos++;
 
-	P0IO |= 0x04;  //set chg_dischg to input
+	P0IO &= 0xFB;  //set chg_dischg to input
 	gIsChargingBatPos = 1;
 	
 	for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
@@ -1172,6 +1174,12 @@ do{
 			}
 		}
 		ClrWdt();
+
+		if(gIsChargingBatPos == BT_4)
+			gHasBat = CHANNEL_30_RES;
+		else
+			gHasBat = CHANNEL_20_RES;
+		
 		#if 0
 		gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
 		if(gBatVoltArray[gIsChargingBatPos] >1923 || gBatVoltArray[gIsChargingBatPos] < 1799 )
@@ -1181,47 +1189,83 @@ do{
 		}
 		//gDetectRemovePos++;	
 		#endif
-		do{
-		setCurrent(testlevel);
-		PwmControl(PWM_ON);
-		delay_ms(100);
-		if(testlevel == 1)
-		{
-			gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
-			if(gBatVoltArray[gIsChargingBatPos] >1923 || gBatVoltArray[gIsChargingBatPos] < 1799 )
-			{
-				fitCount[gIsChargingBatPos] =1;
-			}
-		}
-		else if(testlevel == 2)
-		{
-		}
-		else
-		{
-			
-		}
-		testlevel++;
-		}while(testlevel<= CURRENT_LEVEL_3);
-		
-	}
 
-	//
-	gIsChargingBatPos = 1;
-	setCurrent(CURRENT_LEVEL_1);	
-	PwmControl(PWM_ON);
-	delay_ms(100);
-	gBatVoltArray[0] = getBatTemp(BT_1);
-		delay_ms(700);
-		gBatVoltArray[gIsChargingBatPos]= getVbatAdc(gIsChargingBatPos);
-		if(gChargeCurrent < 10 || gChargeCurrent > 23)
-		{
-			fitCount[gIsChargingBatPos] = 2;
-		}
-		//gDetectRemovePos++;
-		PwmControl(PWM_OFF);		
-	
-	for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
-	{	
+			testlevel = CURRENT_LEVEL_1;
+			do{
+				setCurrent(testlevel);
+				PwmControl(PWM_ON);
+				delay_ms(700);
+				if(testlevel == 1)   //  1.8 - 2.4A     700 -1000   20 /30
+				{
+					gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
+					if(gBatVoltArray[gIsChargingBatPos] >1923 || gBatVoltArray[gIsChargingBatPos] < 1799 )  // 电池通道ADC
+					{
+						PwmControl(PWM_OFF);
+						fitCount[gIsChargingBatPos] =1;
+						break;
+					}
+					gBatVoltArray[gIsChargingBatPos] = getAverage(gHasBat);  //CHANNEL_20_RES or CHANNEL_30_RES
+					PwmControl(PWM_OFF);
+					if(gIsChargingBatPos == BT_4)
+					{
+						preVoltData[0] = CURRENT_MAX_LEVEL_1_AAA;
+						preVoltData[1] = CURRENT_MIN_LEVEL_1_AAA;
+					}
+					else
+					{
+						preVoltData[0] = CURRENT_MAX_LEVEL_1;
+						preVoltData[1] = CURRENT_MIN_LEVEL_1;
+					}
+					if(gBatVoltArray[gIsChargingBatPos] >preVoltData[0]|| gBatVoltArray[gIsChargingBatPos] < preVoltData[1] )  //电流是否合理
+					{
+						fitCount[gIsChargingBatPos] =1;
+						break;
+					}
+					if(gIsChargingBatPos == BT_2 || gIsChargingBatPos == BT_3)
+						break;
+				}
+				else if(testlevel == 2)   //  600 - 1000     200 - 500
+				{
+					gBatVoltArray[gIsChargingBatPos] = getAverage(gHasBat);
+					PwmControl(PWM_OFF);
+					if(gIsChargingBatPos == BT_4)
+					{
+						preVoltData[0] = CURRENT_MAX_LEVEL_2_AAA;
+						preVoltData[1] = CURRENT_MIN_LEVEL_2_AAA;
+					}
+					else
+					{
+						preVoltData[0] = CURRENT_MAX_LEVEL_2;
+						preVoltData[1] = CURRENT_MIN_LEVEL_2;
+					}
+					if(gBatVoltArray[gIsChargingBatPos] >preVoltData[0] || gBatVoltArray[gIsChargingBatPos] < preVoltData[1] )   // 电流是否合理i
+					{
+						fitCount[gIsChargingBatPos] =1;
+						break;
+					}
+				}
+				else   // 100 - 600   50 -300
+				{
+					gBatVoltArray[gIsChargingBatPos] = getAverage(gHasBat);
+					PwmControl(PWM_OFF);
+					if(gIsChargingBatPos == BT_4)
+					{
+						preVoltData[0] = CURRENT_MAX_LEVEL_3_AAA;
+						preVoltData[1] = CURRENT_MIN_LEVEL_3_AAA;
+					}
+					else
+					{
+						preVoltData[0] = CURRENT_MAX_LEVEL_3;
+						preVoltData[1] = CURRENT_MIN_LEVEL_3;
+					}
+					if(gBatVoltArray[gIsChargingBatPos] >preVoltData[0] || gBatVoltArray[gIsChargingBatPos] < preVoltData[1] )  // 电流是否合理i
+					{
+						fitCount[gIsChargingBatPos] =1;
+						break;
+					}
+				}
+				testlevel++;
+			}while(testlevel<= CURRENT_LEVEL_3);
 	}
 }while(0);
 
@@ -1244,7 +1288,7 @@ do{
 			{
 				if(skipCount)
 				{
-					if(fitCount[gIsChargingBatPos] !=0 || gDetectRemovePos <=3)  // >3 means vin5V and NTC both ok
+					if(fitCount[gIsChargingBatPos] !=0 || gDetectRemovePos <=4)  // >3 means vin5V and NTC and yunfang 2.8V all ok
 					{
 						LED_ON(gIsChargingBatPos);
 					}

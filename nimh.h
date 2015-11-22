@@ -147,7 +147,7 @@ typedef 	 unsigned long		u32;
 //output
 #define MIN_VBAT_CHANNEL_1_IDLE	 1944  //(4.7/3=2.4V   2.4/3.3*4096)
 #define MIN_VBAT_OUPUT				372	//(1/3=0.5	0.5/3.3*4096)
-#define MIN_VBAT_OUTPUT_IDLE		508	// (1.23/3 = 0.41  0.65/3.3*4096)
+#define MIN_VBAT_OUTPUT_IDLE		513	// (1.23/3 = 0.41  0.65/3.3*4096)
 #define	OUTPUT_SHOW_LEVEL_3		537	//(1.3/3  0.65/3.3*4096 )
 #define	OUTPUT_SHOW_LEVEL_2		517	//(1.25/3 0.625/3.3*4096)	
 
@@ -176,7 +176,7 @@ typedef 	 unsigned long		u32;
 
 
 #define TEST_VOLT_YUNFANG_MIN		3227			// 2.6 (2.6/3.3*4096)
-#define TEST_VOLT_YUNFANG_MAX	3723				// 3  (3/3.3*4096)
+#define TEST_VOLT_YUNFANG_MAX	3847				// 3  (3.1/3.3*4096)
 
 //temperature adc
 #define 	ADC_TEMP_MAX	1203    //50
@@ -194,6 +194,30 @@ typedef 	 unsigned long		u32;
 
 #define ADC_TEMP_OUTPUT_MAX_RECOVERY	   948       //60
 #define ADC_TEMP_OUTPUT_MIN_RECOVERY	   3177		 // -5
+
+
+//factory test
+ //   1.8 - 2.4A     700 -1000   20 /30       36mV~ 50mV    35mv~50mV 
+  //  600 - 1000     200 - 500	20/30    12mV~30mV      10mV~25mV		
+  // 100 - 600   50 -300               20/30        2mV~12mV     2mV ~15mV
+
+#define CURRENT_MAX_LEVEL_1		62			//50mV   50/3300*4096	
+#define CURRENT_MIN_LEVEL_1             44                    //36      36/3300*4096
+
+#define CURRENT_MAX_LEVEL_2		37			// 30mV   30/3300*4096
+#define CURRENT_MIN_LEVEL_2		14			// 12mV  12/3300*4096
+
+#define CURRENT_MAX_LEVEL_3		14			//  12   12/3300*4096
+#define CURRENT_MIN_LEVEL_3		2			// 2		2/3300*4096
+
+#define CURRENT_MAX_LEVEL_1_AAA		62			//50mV   50/3300*4096	
+#define CURRENT_MIN_LEVEL_1_AAA             43                    //35      35/3300*4096
+
+#define CURRENT_MAX_LEVEL_2_AAA		31			// 25mV   25/3300*4096
+#define CURRENT_MIN_LEVEL_2_AAA		12			// 10mV  10/3300*4096
+
+#define CURRENT_MAX_LEVEL_3_AAA		18			//  15   15/3300*4096
+#define CURRENT_MIN_LEVEL_3_AAA		2			// 2		2/3300*4096
 
 #elif (LDO_LEVEL == 4000)
 #warning "4v ldo"
