@@ -96,6 +96,9 @@ void FindTwoBattery()
 			}
 		}
 	}
+
+	temp = BT_NULL;
+	
 	if(fitNum)
 	{
 		if(fitNum == 1)
@@ -105,7 +108,12 @@ void FindTwoBattery()
 				if(gNowTwoBuf[0] == batNum)
 				{	
 					if(batNum == BT_4 && fitNum == 1)
-						gNowTwoBuf[1] = batNum-1;
+					{
+						if(temp != BT_NULL)
+							gNowTwoBuf[1] = temp;
+						else
+							gNowTwoBuf[1] = BT_3;
+					}
 					continue;
 				}
 				if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING)// CHARGE_STATE_ERROR | BAT_TYPE_ERROR | CHARGE_STATE_FULL
@@ -120,6 +128,10 @@ void FindTwoBattery()
 						if(gBatVoltArray[batNum] > gBatVoltArray[gNowTwoBuf[1]])
 							gNowTwoBuf[1] = batNum;
 					}
+				}
+				if(gBatStateBuf[batNum] == STATE_BATTERY_FULL)
+				{
+					temp = batNum;
 				}
 			}
 		}
@@ -676,7 +688,35 @@ void setCurrent(u8 level)
 	gCurrentNow = level;
 }
 
+u8 EnterTrickleCharge()
+{
+	u8 batNum,fitCount = 0;;
 
+	if(gChargingTimeTick[gIsChargingBatPos] > TRICKLE_CHARGE_COUNT)
+		return 0;
+
+	if(gIsInTwoState)
+	{
+		if(gNowTwoBuf[0] == gIsChargingBatPos || gNowTwoBuf[1] == gIsChargingBatPos)
+			return 1;
+		else
+			return 0;
+	}
+
+	for(batNum = BT_1; batNum <= BT_4; batNum++)
+	{
+		if(batNum == gIsChargingBatPos)
+			continue;
+		if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING)
+		{
+			fitCount++;
+			if(fitCount > 1)
+				return 0;
+		}
+	}
+
+	return 1;
+}
 void PreChargeBatHandler()
 {
 	if(RestTime[gPreChargingBatPos] > MIN_DETECT_PRE_BATTERY && isPwmOn == 0)
@@ -751,7 +791,17 @@ void chargeHandler(void)
 		}
 		else if(battery_state == STATE_BATTERY_FULL)
 		{
-			chargingTime = CHARGING_TIME_0MS;
+			if(EnterTrickleCharge())
+			{
+				chargingTime = CHARGING_TIME_200MS;
+			}
+			else if(gIsChargingBatPos == BT_1)
+			{
+				chargingTime = CHARGING_TIME_10MS;
+			}
+			else
+				chargingTime = CHARGING_TIME_0MS;
+			chargeCurrent = CURRENT_LEVEL_3;
 		}
 		else
 			chargingTime =0;
@@ -975,14 +1025,23 @@ void chargeHandler(void)
 				}
 				else if(battery_state == STATE_BATTERY_FULL)
 				{
-					tempV = getVbatAdc(BT_1);
-					PwmControl(PWM_OFF);
-					if(tempV > BAT_ZERO_SPEC_VOLT)
+					if(chargingTime == CHARGING_TIME_10MS)   // only for BT_1
 					{
-						StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
+						tempV = getVbatAdc(BT_1);
+						PwmControl(PWM_OFF);
+						if(tempV > BAT_ZERO_SPEC_VOLT)
+						{
+							StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
+						}
+						PwmControl(PWM_OFF);
+						gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 					}
-					PwmControl(PWM_OFF);
-					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
+					else
+					{
+						PwmControl(PWM_OFF);
+						gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
+						gChargingTimeTick[gIsChargingBatPos]++;
+					}
 				}
 				else
 				{
@@ -1012,13 +1071,13 @@ void PickBattery()
 
 		toNextBattery();
 
-		if(gBatStateBuf[gIsChargingBatPos] == STATE_NORMAL_CHARGING)
+		if(gBatStateBuf[gIsChargingBatPos] == STATE_NORMAL_CHARGING || gBatStateBuf[gIsChargingBatPos] == STATE_BATTERY_FULL)
 		{
 			if(gIsInTwoState)
 			{
 				while(gNowTwoBuf[0] != gIsChargingBatPos && gNowTwoBuf[1] != gIsChargingBatPos)
 				{
-					if(gBatStateBuf[gIsChargingBatPos] != STATE_NORMAL_CHARGING)
+					if(gBatStateBuf[gIsChargingBatPos] != STATE_NORMAL_CHARGING  &&	gBatStateBuf[gIsChargingBatPos] != STATE_BATTERY_FULL)
 						return;
 					if(gIsChargingBatPos == BT_1)  //we can't detect whether BT_1 exist by zero volt 
 						break;
