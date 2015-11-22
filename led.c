@@ -94,7 +94,7 @@ if(gSysStatus == SYS_CHARGING_STATE)
 	{
 		for(i=BT_1;i<=BT_4;i++)
 		{
-			if(gBatStateBuf[i] == STATE_BATTERY_TYPE_ERROR ||gBatStateBuf[i] == STATE_BATTERY_TEMPERATURE_ERROR)
+			if(gBatStateBuf[i] == STATE_BATTERY_TYPE_ERROR | gBatStateBuf[i] == STATE_BATTERY_TEMPERATURE_ERROR)
 			{
 				LED_ON(i);	
 			}
@@ -110,7 +110,7 @@ if(gSysStatus == SYS_CHARGING_STATE)
 	{
 		for(i=BT_1;i<=BT_4;i++)
 		{
-			if(gBatStateBuf[i] == STATE_BATTERY_TYPE_ERROR ||gBatStateBuf[i] == STATE_BATTERY_TEMPERATURE_ERROR)
+			if(gBatStateBuf[i] == STATE_BATTERY_TYPE_ERROR | gBatStateBuf[i] == STATE_BATTERY_TEMPERATURE_ERROR)
 				LED_OFF(i);		
 		}
 		ledErrorCount++;

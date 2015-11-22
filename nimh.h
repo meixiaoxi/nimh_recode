@@ -48,8 +48,8 @@ typedef 	 unsigned long		u32;
 #define STATE_BATTERY_FULL								3
 #define STATE_BATTERY_TYPE_ERROR						4
 #define STATE_BATTERY_TEMPERATURE_ERROR 				5
-//#define STATE_ZERO_BATTERY_TEMPERATURE_ERROR 		6
-//#define STATE_ZERO_BATTERY_CHARGE_ERROR				7
+//#define STATE_BT_1_TEMPERATURE_ERROR 				6
+//#define STATE_BT_1_BATTERY_CHARGE_ERROR				7
 
 #define CHARGING_TIME_0MS	0
 #define CHARGING_TIME_10MS	1
@@ -114,12 +114,14 @@ typedef 	 unsigned long		u32;
 
 #define BAT_MIN_VOLT_OPEN_SPE	372 			//(0.3/3.3)*4096
 
-#define BAT_MAX_VOLT_CLOSE 2482		//(2/3.3*4096)        (1.8/3.3)*4096	
+#define BAT_MAX_VOLT_CLOSE 2445		//(1.97/3.3*4096)        (1.8/3.3)*4096	
 #define BAT_MAX_VOLT_CLOSE_CHANNEL_4		2234	//(1.8/3.3)*4096
 
-#define BAT_MAX_CLOS_LEVEL_2		2159				//(1.65+0.09)  (1.74/3.3*4096)
+#define BAT_MAX_CLOS_LEVEL_2		2142				//(1.65+0.076)  (1.726/3.3*4096)
 #define BAT_MAX_CLOSE_CHANNEL_4_LEVEL_2	 2048		// (1.65   1.65/3.3)*4096
 
+#define BAT_MAX_CLOS_LEVEL_3			2028						// 1.6 + 0.034
+#define BAT_MAX_CLOSE_CHANNEL_4_LEVEL_3	1985				// 1.6  1.6/3.3*4096
 
 #define BAT_LEVEL_LOW_TO_MIDD		1737			// 1.4     (1.4/3.3)*4096
 #define BAT_LEVEL_MIDD_TO_HIGH		1750				//  1.41	(1.41/3.3)*4096

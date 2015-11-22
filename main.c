@@ -395,12 +395,15 @@ void StatusCheck()
 #define	BAT_AAA_TYPE	1
 void StatusChange(u8 batNum, u8 statusNow)
 {
+	if(batNum == gPreChargingBatPos)
+		gPreChargingBatPos = BT_NULL;
 	if(statusNow == STATE_DEAD_BATTERY)
 	{
 		removeBat(batNum);
 	}
-	else
+	else		
 		gBatStateBuf[batNum] = statusNow;
+
 	gIsInTwoState = 0;
 }
 
@@ -732,15 +735,22 @@ void chargeHandler(void)
 		}
 		else if(battery_state == STATE_BATTERY_TYPE_ERROR)
 		{
-			chargingTime = CHARGING_TIME_0MS;
+			if(gIsChargingBatPos == BT_1)
+				chargingTime = CHARGING_TIME_10MS;
+			else
+				chargingTime = CHARGING_TIME_0MS;
+			chargeCurrent = CURRENT_LEVEL_3;
 		}
 		else if(battery_state == STATE_BATTERY_TEMPERATURE_ERROR)
 		{
-			chargingTime = CHARGING_TIME_0MS;
+			if(gIsChargingBatPos == BT_1)
+				chargingTime = CHARGING_TIME_10MS;
+			else
+				chargingTime = CHARGING_TIME_0MS;
+			chargeCurrent = CURRENT_LEVEL_3;
 		}
 		else if(battery_state == STATE_BATTERY_FULL)
 		{
-
 			chargingTime = CHARGING_TIME_0MS;
 		}
 		else
@@ -867,14 +877,12 @@ void chargeHandler(void)
 						if(gIsChargingBatPos == BT_4 || gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
 						{
 						#ifdef DVT_BOARD
-							if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
-								temp_3 = 0;
-							else
-								temp_3 = 1;
-							if(gCurrentLevel[temp_3] == CURRENT_LEVEL_1)
+							if(gCurrentNow== CURRENT_LEVEL_1)
 								temp_2 = BAT_MAX_VOLT_CLOSE_CHANNEL_4;
-							else if(gCurrentLevel[temp_3] == CURRENT_LEVEL_2)
+							else if(gCurrentNow == CURRENT_LEVEL_2)
 								temp_2 = BAT_MAX_CLOSE_CHANNEL_4_LEVEL_2;
+							else 
+								temp_2 = BAT_MAX_CLOSE_CHANNEL_4_LEVEL_3;
 						#else
 							temp_2 = BAT_MAX_VOLT_CLOSE_CHANNEL_4;
 						#endif	
@@ -882,10 +890,12 @@ void chargeHandler(void)
 						else
 						{
 						#ifdef DVT_BOARD
-							if(gCurrentLevel[1] == CURRENT_LEVEL_1)
+							if(gCurrentNow == CURRENT_LEVEL_1)
 								temp_2 = BAT_MAX_VOLT_CLOSE;
-							else if(gCurrentLevel[1] == CURRENT_LEVEL_2)
+							else if(gCurrentNow == CURRENT_LEVEL_2)
 								temp_2 = BAT_MAX_CLOS_LEVEL_2;
+							else
+								temp_2 = BAT_MAX_CLOS_LEVEL_3;
 						#else
 							temp_2 = BAT_MAX_VOLT_CLOSE;
 						#endif	
@@ -940,8 +950,37 @@ void chargeHandler(void)
 					gPreChargingBatPos = gIsChargingBatPos;
 					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 				}
+				else if(battery_state == STATE_BATTERY_TEMPERATURE_ERROR)   //only for BT_1
+				{
+					tempV = getVbatAdc(gIsChargingBatPos);
+					tempT = getBatTemp(gIsChargingBatPos);
+					PwmControl(PWM_OFF);
+					if(tempV > BAT_ZERO_SPEC_VOLT)
+					{
+						StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
+					}
+					else if(tempT > ADC_TEMP_MAX_RECOVERY && tempT < ADC_TEMP_MIN_RECOVERY)
+						StatusChange(gIsChargingBatPos,STATE_NORMAL_CHARGING);
+					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
+				}
+				else if(battery_state == STATE_BATTERY_TYPE_ERROR)
+				{
+					tempV = getVbatAdc(gIsChargingBatPos);
+					PwmControl(PWM_OFF);
+					if(tempV > BAT_ZERO_SPEC_VOLT)
+					{
+						StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
+					}
+					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
+				}
 				else if(battery_state == STATE_BATTERY_FULL)
 				{
+					tempV = getVbatAdc(BT_1);
+					PwmControl(PWM_OFF);
+					if(tempV > BAT_ZERO_SPEC_VOLT)
+					{
+						StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
+					}
 					PwmControl(PWM_OFF);
 					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 				}
