@@ -552,6 +552,8 @@ void FastCharge(u8 batNum)
 		gChargingTimeTick[batNum]++;
 		if(tempV > BAT_VOLT_NEAR_FULL)
 			gNearFullTimeTick[batNum]++;
+		else if(gNearFullTimeTick[batNum] < 50)
+			gNearFullTimeTick[batNum] = 0;
 	}
 	else if(gCurrentNow == CURRENT_LEVEL_2)
 	{
@@ -562,6 +564,8 @@ void FastCharge(u8 batNum)
 			gSmallModeCount[batNum] = 0;
 			if(tempV > BAT_VOLT_NEAR_FULL)
 				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 3;
+			else if(gNearFullTimeTick[batNum] < 50)
+				gNearFullTimeTick[batNum] = 0;
 		}
 	}
 	else
@@ -573,6 +577,8 @@ void FastCharge(u8 batNum)
 			gSmallModeCount[batNum] = 0;
 			if(tempV > BAT_VOLT_NEAR_FULL)
 				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 4;
+			else if(gNearFullTimeTick[batNum] < 50)
+				gNearFullTimeTick[batNum] = 0;
 		}
 	}
 	}
@@ -583,6 +589,8 @@ void FastCharge(u8 batNum)
 		gChargingTimeTick[batNum]++;
 		if(tempV > BAT_VOLT_NEAR_FULL)
 			gNearFullTimeTick[batNum]++;
+		else if(gNearFullTimeTick[batNum] < 50)
+			gNearFullTimeTick[batNum] = 0;
 	}
 	else if(gCurrentNow == CURRENT_LEVEL_2)
 	{
@@ -593,6 +601,8 @@ void FastCharge(u8 batNum)
 			gSmallModeCount[batNum] = 0;
 			if(tempV > BAT_VOLT_NEAR_FULL)
 				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 12;
+			else if(gNearFullTimeTick[batNum] < 50)
+				gNearFullTimeTick[batNum] = 0;
 		}
 	}
 	else
@@ -604,6 +614,8 @@ void FastCharge(u8 batNum)
 			gSmallModeCount[batNum] = 0;
 			if(tempV > BAT_VOLT_NEAR_FULL)
 				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 5;
+			else if(gNearFullTimeTick[batNum] < 50)
+				gNearFullTimeTick[batNum] = 0;
 		}
 	}		
 	}
