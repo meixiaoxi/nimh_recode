@@ -358,7 +358,7 @@ typedef 	 unsigned long		u32;
 #define BAT_START_DV_COUNT	750                     // 2.5min (2.5*60*1000/500)
 #define BAT_CHARGING_FAST_MAX_COUNT		16500	// 55min (55min*60*1000/500)
 #define BAT_CHARGING_FAST_MAX_COUNT_AAA	15000	// 50min   (50*60*1000/500)
-#define BAT_INITIAL_FULL_CHECK_COUNT		450		// 1.5min  (90*1000/500)
+#define BAT_INITIAL_FULL_CHECK_COUNT		600		// 2min  (90*1000/500)
 #define BAT_NEAR_FULL_MAX_COUNT			2400		//8min (8*60*1000/500)
 
 
