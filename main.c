@@ -1173,12 +1173,13 @@ do{
 
 	gBatVoltArray[0] = getVbatAdc(BT_1);
 	PwmControl(PWM_OFF);
+	
+	P0IO &= 0xFB;  //set chg_dischg to input
+	gIsChargingBatPos = 1;
+	
 	if(gBatVoltArray[0] > TEST_VOLT_YUNFANG_MAX|| gBatVoltArray[0] < TEST_VOLT_YUNFANG_MIN)  // 2.8 +/- 0.2
 		break;
 	gDetectRemovePos++;
-
-	P0IO &= 0xFB;  //set chg_dischg to input
-	gIsChargingBatPos = 1;
 	
 	for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 	{
@@ -1209,11 +1210,21 @@ do{
 			do{
 				setCurrent(testlevel);
 				PwmControl(PWM_ON);
-				delay_ms(700);
+				delay_ms(200);
 				if(testlevel == 1)   //  1.8 - 2.4A     700 -1000   20 /30
 				{
+					if(gIsChargingBatPos == BT_4)
+					{
+						preVoltData[0] = 868;
+						preVoltData[1] = 1365;
+					}
+					else
+					{
+						preVoltData[0] = 2234;
+						preVoltData[1] = 2730;
+					}
 					gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
-					if(gBatVoltArray[gIsChargingBatPos] >1923 || gBatVoltArray[gIsChargingBatPos] < 1799 )  // 电池通道ADC
+					if(gBatVoltArray[gIsChargingBatPos] >preVoltData[1] || gBatVoltArray[gIsChargingBatPos] < preVoltData[0] )  // 电池通道ADC
 					{
 						PwmControl(PWM_OFF);
 						fitCount[gIsChargingBatPos] =1;
@@ -1327,7 +1338,11 @@ do{
 		{
 			for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 			{
-				if(gDetectRemovePos != 1)
+				if(gDetectRemovePos <= 4)
+				{
+					LED_ON(gDetectRemovePos -1);;
+				}
+				else
 				{
 					if(fitCount[gIsChargingBatPos] == 1)
 						LED_ON(gIsChargingBatPos);
