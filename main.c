@@ -51,6 +51,7 @@ u8 gDetectRemovePos=0;
 u8 gHasBat = 0;
 u8 gIsInTempProtect[4] = {0,0,0,0};
 u8 tryUpDnCurrent[2] = {UP_CURRENT,UP_CURRENT};
+u8 tryCount =0;
 
 extern u8 ledDisplayCount;
 extern u8 gLedStatus;
@@ -923,6 +924,7 @@ void chargeHandler(void)
 							gCurrentLevel[1] = CURRENT_LEVEL_3;
 							tryUpDnCurrent[0] = UP_CURRENT;
 							tryUpDnCurrent[1] = UP_CURRENT;
+							tryCount =0;
 							if(tempV< CHARGING_PRE_END_VOLT )
 								gChargeChildStatus[gIsChargingBatPos] =  CHARGE_STATE_PRE;
 							else
@@ -1000,9 +1002,14 @@ void chargeHandler(void)
 							temp_2 = getAverage(CHANNEL_VIN_5V);
 							if(temp_2 < VIN_5V_MINUM)
 							{
-								if(gCurrentLevel[temp_3] < CURRENT_LEVEL_3)
-									gCurrentLevel[temp_3]++;
-								tryUpDnCurrent[temp_3] = DN_CURRENT;
+								tryCount++;
+								if(tryCount > 7)
+								{
+									if(gCurrentLevel[temp_3] < CURRENT_LEVEL_3)
+										gCurrentLevel[temp_3]++;
+									tryUpDnCurrent[temp_3] = DN_CURRENT;
+									tryCount = 0;
+								}
 							}
 						}
 						else
@@ -1011,6 +1018,7 @@ void chargeHandler(void)
 							{
 								if(gCurrentLevel[temp_3] > CURRENT_LEVEL_1)
 								{
+									tryCount = 0;
 									gCurrentLevel[temp_3]--;
 								}
 							}
