@@ -828,7 +828,7 @@ void chargeHandler(void)
 				gHasBat = 0;
 				tempV = getVbatAdc(gIsChargingBatPos);
 
-				if(tempV >= BAT_MAX_VOLT_OPEN)
+				if(tempV >= BAT_MAX_VOLT_OPEN && gIsChargingBatPos != BT_1)
 				{
 					StatusChange(gIsChargingBatPos, STATE_BATTERY_TYPE_ERROR);
 					return;
@@ -1053,7 +1053,14 @@ void chargeHandler(void)
 					}
 					else
 					{
+						tempV = getVbatAdc(gIsChargingBatPos);
 						PwmControl(PWM_OFF);
+						if(tempV > BAT_ZERO_SPEC_VOLT)
+						{
+							StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
+							gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
+							return;
+						}
 						gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 						gChargingTimeTick[gIsChargingBatPos]++;
 					}
