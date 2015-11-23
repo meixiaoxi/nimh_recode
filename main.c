@@ -148,15 +148,23 @@ do
 	if(gOutputStatus != OUTPUT_STATUS_STOP)
 	{
 		gDelayCount++;
-		if(gDelayCount>=5)
+		if(gDelayCount>=20)
 		{
 			gDelayCount=0;
 		//	if(gOutputStatus == OUTPUT_STATUS_WAIT)
 		//		gBatStateBuf[0] = 1;
 			if(gOutputStatus == OUTPUT_STATUS_NORMAL)
-				temp_min = MIN_VBAT_OUPUT;
+			{
+				gChargeCurrent_2 = getAverage(CHANNEL_20_RES);  // 放电电流
+
+				temp_min = MIN_VBAT_OUPUT - (3*gChargeCurrent_2) ;
+				if(temp_min < 289)  //0.7   
+					temp_min = 289;
+			}
 			else
 				temp_min = MIN_VBAT_OUTPUT_IDLE;
+
+			
 
 			preVoltData[BT_1] = getAverage(CHANNEL_VBAT_1);
 			preVoltData[BT_2] = getAverage(CHANNEL_VBAT_2);
@@ -170,18 +178,23 @@ do
 			preVoltData[BT_4] = preVoltData[BT_4] /3;
 			#endif
 
+			if(preVoltData[BT_1] < MIN_VBAT_1 || preVoltData[BT_1] > 4000)   // 3.5V   10V
+			{
+				isVbatOk = 0;
+			}
 			for(cur_detect_pos = BT_1; cur_detect_pos <BT_4; cur_detect_pos++)
 			{
 				if(preVoltData[cur_detect_pos+1] > preVoltData[cur_detect_pos])
-					gBatVoltArray[cur_detect_pos] = 0;
+					gChargeCurrent = 0;
 				else
-					gBatVoltArray[cur_detect_pos] = preVoltData[cur_detect_pos] -preVoltData[cur_detect_pos+1];
-				if(gBatVoltArray[cur_detect_pos] < temp_min)
+					gChargeCurrent = preVoltData[cur_detect_pos] -preVoltData[cur_detect_pos+1];
+				
+				if(gChargeCurrent < temp_min)
 				{
 					isVbatOk = 0;
 					if(gOutputStatus == OUTPUT_STATUS_WAIT)
 					{
-						if(gBatVoltArray[cur_detect_pos-1] < MIN_OUTPUT_DISPLAY_VOLT)
+						if(gChargeCurrent < MIN_OUTPUT_DISPLAY_VOLT)
 							gBatStateBuf[0] = 1;
 					}	
 				}	
@@ -224,7 +237,7 @@ do
 					}
 				}
 			}
-				
+
 				if(isVbatOk== 1 && skipCount == 0)
 				{
 					if(gOutputStatus == OUTPUT_STATUS_WAIT)
@@ -377,6 +390,7 @@ void StatusCheck()
 					gDelayCount = 50;
 					skipCount = 0;
 					gHasBat = 0;
+					gChargeCount = 0;
 				}
 			}
 			else
@@ -390,6 +404,7 @@ void StatusCheck()
 
 				ledDisplayCount = 0;
 				gLedStatus = 1;
+				gChargeCount = 0;
 			}
 		}	
 }

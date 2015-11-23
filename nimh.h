@@ -151,6 +151,9 @@ typedef 	 unsigned long		u32;
 #define	OUTPUT_SHOW_LEVEL_3		537	//(1.3/3  0.65/3.3*4096 )
 #define	OUTPUT_SHOW_LEVEL_2		517	//(1.25/3 0.625/3.3*4096)	
 
+#define MIN_VBAT_1		1448				//  3.5/3 for LDO   3.5/3/3.3*4096
+
+
 #define	MIN_OUTPUT_DISPLAY_VOLT	289	 // 0.7  0.7/3/3.3*4096
 
 #define	BAT_LEVEL_43_OUTPUT		521      // 1.26/3 (1.26/3.3/2*4096)
