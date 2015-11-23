@@ -121,8 +121,8 @@ typedef 	 unsigned long		u32;
 #define BAT_MAX_CLOS_LEVEL_2		2142				//(1.65+0.076)  (1.726/3.3*4096)
 #define BAT_MAX_CLOSE_CHANNEL_4_LEVEL_2	 2048		// (1.65   1.65/3.3)*4096
 
-#define BAT_MAX_CLOS_LEVEL_3			2028						// 1.6 + 0.034
-#define BAT_MAX_CLOSE_CHANNEL_4_LEVEL_3	1985				// 1.6  1.6/3.3*4096
+#define BAT_MAX_CLOS_LEVEL_3			1990						// 1.57 + 0.034
+#define BAT_MAX_CLOSE_CHANNEL_4_LEVEL_3	1948				// 1.57  1.57/3.3*4096
 
 #define BAT_LEVEL_LOW_TO_MIDD		1737			// 1.4     (1.4/3.3)*4096
 #define BAT_LEVEL_MIDD_TO_HIGH		1750				//  1.41	(1.41/3.3)*4096
