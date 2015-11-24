@@ -1018,10 +1018,10 @@ void chargeHandler(void)
 							{
 								if(gCurrentLevel[temp_3] > CURRENT_LEVEL_1)
 								{
-									tryCount = 0;
 									gCurrentLevel[temp_3]--;
 								}
 							}
+							tryCount = 0;
 						}
 						#endif
 					}
