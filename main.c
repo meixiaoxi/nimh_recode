@@ -159,7 +159,7 @@ do
 				gChargeCurrent_2 = getAverage(CHANNEL_20_RES);  // 放电电流
 
 				temp_min = MIN_VBAT_OUPUT - (3*gChargeCurrent_2) ;
-				if(temp_min < 289)  //0.7   
+				if(temp_min < 289 || gChargingTimeTick[0] < 900)  //0.7   
 					temp_min = 289;
 			}
 			else
@@ -250,12 +250,15 @@ do
 						gBatStateBuf[3] = 0;
 						gIsInTwoState = 0;
 						ENABLE_BOOST();
+						gChargingTimeTick[0] = 0;
 						//updateBatLevel(gBatVoltArray[1][0],gCount+1);
 					}
+					gChargingTimeTick[0]++;
 				}
 				else
 				{
 					gOutputStatus = OUTPUT_STATUS_WAIT;
+					gChargingTimeTick[0] = 0;
 					if(gBatStateBuf[0])
 					{
 						LED_OFF(BT_1),LED_OFF(BT_2),LED_OFF(BT_3),LED_OFF(BT_4);
