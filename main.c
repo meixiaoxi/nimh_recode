@@ -35,6 +35,7 @@ u8 idata gCurrentLevel[2] = {CURRENT_LEVEL_3,CURRENT_LEVEL_3};
 u8 idata gCurrentNow = 1;
 u8 idata gIsInTwoState= 0;
 u8 idata gNowTwoBuf[2];
+u8 gPreCurrent = 1;
 
 
 
@@ -551,7 +552,7 @@ void FastCharge(u8 batNum)
 
 	if(gBatType[batNum] != BAT_AAA_TYPE)
 	{
-	if(gCurrentNow== CURRENT_LEVEL_1)	
+	if(gPreCurrent== CURRENT_LEVEL_1)	
 	{
 		gChargingTimeTick[batNum]++;
 		if(tempV > BAT_VOLT_NEAR_FULL)
@@ -559,7 +560,7 @@ void FastCharge(u8 batNum)
 		else if(gNearFullTimeTick[batNum] < 50)
 			gNearFullTimeTick[batNum] = 0;
 	}
-	else if(gCurrentNow == CURRENT_LEVEL_2)
+	else if(gPreCurrent== CURRENT_LEVEL_2)
 	{
 		gSmallModeCount[batNum]++;
 		if(gSmallModeCount[batNum] >= 7)
@@ -588,7 +589,7 @@ void FastCharge(u8 batNum)
 	}
 	else
 	{
-	if(gCurrentNow== CURRENT_LEVEL_1)	
+	if(gPreCurrent== CURRENT_LEVEL_1)	
 	{
 		gChargingTimeTick[batNum]++;
 		if(tempV > BAT_VOLT_NEAR_FULL)
@@ -596,7 +597,7 @@ void FastCharge(u8 batNum)
 		else if(gNearFullTimeTick[batNum] < 50)
 			gNearFullTimeTick[batNum] = 0;
 	}
-	else if(gCurrentNow == CURRENT_LEVEL_2)
+	else if(gPreCurrent== CURRENT_LEVEL_2)
 	{
 		gSmallModeCount[batNum]++;
 		if(gSmallModeCount[batNum] >= 29)
@@ -1036,6 +1037,7 @@ void chargeHandler(void)
 					}
 					
 					gPreChargingBatPos = gIsChargingBatPos;
+					gPreCurrent = gCurrentNow;
 					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 				}
 				else if(battery_state == STATE_BATTERY_TEMPERATURE_ERROR)   //only for BT_1
