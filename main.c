@@ -258,6 +258,14 @@ do
 				}
 				else
 				{
+					if(skipCount == 0 && gOutputStatus == OUTPUT_STATUS_NORMAL)   //  temperature ok
+					{
+						if(gChargingTimeTick[0] < 10)
+						{
+							gChargingTimeTick[0]++;
+							return;
+						}
+					}
 					gOutputStatus = OUTPUT_STATUS_WAIT;
 					gChargingTimeTick[0] = 0;
 					if(gBatStateBuf[0])
