@@ -508,7 +508,7 @@ void batteryDetect(u8 batNum,u16 tempV)
 	else
 		isPwmOn = BAT_MAX_VOLT_CLOSE;
 					
-	if(tempV>isPwmOn || gChargeCurrent <3  )
+	if(tempV>isPwmOn || gChargeCurrent_2 <3  )
 	{
 		StatusChange(batNum, STATE_BATTERY_TYPE_ERROR);
 		PwmControl(PWM_OFF);
@@ -1252,7 +1252,7 @@ do{
 				setCurrent(testlevel);
 				delay_ms(10);
 				gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
-				if(gChargeCurrent > 7) // we haven't open MOS, so should not have current
+				if(gChargeCurrent_2 > 7) // we haven't open MOS, so should not have current
 					break;
 				PwmControl(PWM_ON);
 				delay_ms(200);

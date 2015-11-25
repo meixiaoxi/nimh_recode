@@ -2,7 +2,7 @@
 //u8 tempStr1[] = "temp1:";
 //u8 tempStr2[] = "temp2:";
 
-extern u16 gChargeCurrent;
+extern u16 gChargeCurrent_2;
 u16 getAdcValue(u8 channel)
 {
 	
@@ -127,7 +127,7 @@ u16 getVbatAdc(u8 channel)
 	}
 
 
-	gChargeCurrent= getAverage(CHANNEL_20_RES);
+	gChargeCurrent_2= getAverage(CHANNEL_30_RES);
 	tempV = getAverage(channel);
 
 //	sendStr(tempStr1);
@@ -135,10 +135,10 @@ u16 getVbatAdc(u8 channel)
 //	sendStr(tempStr2);
 //	send(temp2);
 
-	if(tempV < gChargeCurrent)
+	if(tempV < gChargeCurrent_2)
 	{
-		gChargeCurrent = 0;
+		gChargeCurrent_2 = 0;
 		return 0;
 	}
-	return (tempV-gChargeCurrent);
+	return (tempV-gChargeCurrent_2);
 }
