@@ -1213,6 +1213,7 @@ do{
 
 	gBatVoltArray[0] = getVbatAdc(BT_1);
 	PwmControl(PWM_OFF);
+	delay_ms(10);
 	
 	P0IO &= 0xFB;  //set chg_dischg to input
 	gIsChargingBatPos = 1;
@@ -1249,6 +1250,10 @@ do{
 			testlevel = CURRENT_LEVEL_1;
 			do{
 				setCurrent(testlevel);
+				delay_ms(10);
+				gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
+				if(gChargeCurrent > 7) // we haven't open MOS, so should not have current
+					break;
 				PwmControl(PWM_ON);
 				delay_ms(200);
 				if(testlevel == 1)   //  1.8 - 2.4A     700 -1000   20 /30
