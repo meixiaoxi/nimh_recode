@@ -64,8 +64,15 @@ void FindTwoBattery()
 	{
 		for(batNum=BT_1; batNum<=BT_4;batNum++)
 		{
-			if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING && gBatVoltArray[batNum]>= BAT_START_FAST_CHARGE)// CHARGE_STATE_ERROR | BAT_TYPE_ERROR | CHARGE_STATE_FULL
+			if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING)// CHARGE_STATE_ERROR | BAT_TYPE_ERROR | CHARGE_STATE_FULL
 			{
+				if(gChargingTimeTick[batNum] < BAT_START_DV_COUNT)
+				{
+					gIsInTwoState = 0;
+					return;
+				}
+				if(gBatVoltArray[batNum]>= BAT_START_FAST_CHARGE)
+				{
 				if(fitNum == 2)
 				{
 					if(gBatVoltArray[batNum] > gBatVoltArray[gNowTwoBuf[1]])	
@@ -94,6 +101,7 @@ void FindTwoBattery()
 					else
 						gNowTwoBuf[0] = batNum;
 					fitNum++;
+				}
 				}
 			}
 		}
