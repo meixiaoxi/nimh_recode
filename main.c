@@ -147,7 +147,7 @@ void outputHandler()
 	u16 temp_min;
 do
 {
-	if(gOutputStatus != OUTPUT_STATUS_STOP)
+	//if(gOutputStatus != OUTPUT_STATUS_STOP)
 	{
 		gDelayCount++;
 		if(gDelayCount>=20)
@@ -172,6 +172,12 @@ do
 			preVoltData[BT_2] = getAverage(CHANNEL_VBAT_2);
 			preVoltData[BT_3] = getAverage(CHANNEL_VBAT_3);
 			preVoltData[BT_4] = getAverage(CHANNEL_VBAT_4);
+
+			if(gOutputStatus ==OUTPUT_STATUS_STOP)
+			{
+				if(preVoltData[BT_1] < BAT_MIN_VOLT_OPEN || preVoltData[BT_2] < BAT_MIN_VOLT_OPEN || preVoltData[BT_3] < BAT_MIN_VOLT_OPEN || preVoltData[BT_4] < BAT_MIN_VOLT_OPEN)				   
+					   gOutputStatus = OUTPUT_STATUS_WAIT;
+			}
 
 			#ifdef EVT_BOARD
 			preVoltData[BT_3] = preVoltData[BT_3] /3;
@@ -266,7 +272,10 @@ do
 							return;
 						}
 					}
-					gOutputStatus = OUTPUT_STATUS_WAIT;
+					if(gOutputStatus == OUTPUT_STATUS_NORMAL)
+						gOutputStatus = OUTPUT_STATUS_STOP;
+					else
+						gOutputStatus = OUTPUT_STATUS_WAIT;
 					gChargingTimeTick[0] = 0;
 					if(gBatStateBuf[0])
 					{
@@ -1477,7 +1486,7 @@ void main()
 
 	delay_ms(16);
 
-	LVRCR  = 0x0E;                      // builtin reset 2.75V set, LVRCR.0=0 enable !!!
+	LVRCR  = 0x02;                      // builtin reset 2.75V set, LVRCR.0=0 enable !!!
 
 	InitConfig();
 
