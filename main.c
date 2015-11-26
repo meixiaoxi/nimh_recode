@@ -1024,7 +1024,7 @@ void chargeHandler(void)
 							if(temp_2 < VIN_5V_MINUM)
 							{
 								tryCount++;
-								if(tryCount > 7)
+								//if(tryCount > 7)
 								{
 									if(gCurrentLevel[temp_3] < CURRENT_LEVEL_3)
 										gCurrentLevel[temp_3]++;
