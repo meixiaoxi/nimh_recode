@@ -282,8 +282,7 @@ do
 					}
 					if(gOutputStatus == OUTPUT_STATUS_NORMAL)
 						gOutputStatus = OUTPUT_STATUS_STOP;
-					else
-						gOutputStatus = OUTPUT_STATUS_WAIT;
+
 					gChargingTimeTick[0] = 0;
 					if(gBatStateBuf[0])
 					{
