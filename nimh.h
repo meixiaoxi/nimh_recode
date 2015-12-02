@@ -136,7 +136,7 @@ typedef 	 unsigned long		u32;
 #define DV_ENABLE_MIN_VOLT		1774						//  (1.43/3.3)*4096
 #define BAT_VOLT_CHANGE_FASTER	1750						//  (1.41/3.3)*4096
 
-
+#define BAT_VOLT_ALK_MIN		620				// 1.5	(1.5/3/3.3*4096)
 
 #define BAT_LEVEL_12_CHARGING		1700		// 1.37   (1.37/3.3*4096)
 #define BAT_LEVEL_23_CHARGING		1725		// 1.39    (1.39/3.3*4096)
@@ -146,10 +146,12 @@ typedef 	 unsigned long		u32;
 
 //output
 #define MIN_VBAT_CHANNEL_1_IDLE	 1944  //(4.7/3=2.4V   2.4/3.3*4096)
-#define MIN_VBAT_OUPUT				330	//(1/3=0.5	0.5/3.3*4096)
-#define MIN_VBAT_OUTPUT_IDLE		513	// (1.23/3 = 0.41  0.65/3.3*4096)
+#define MIN_VBAT_OUPUT				372	//(0.9/3=0.3	0.3/3.3*4096)
+#define MIN_VBAT_OUTPUT_IDLE		405	// (0.98/3 = 0.32  0.32/3.3*4096)
 #define	OUTPUT_SHOW_LEVEL_3		537	//(1.3/3  0.65/3.3*4096 )
 #define	OUTPUT_SHOW_LEVEL_2		517	//(1.25/3 0.625/3.3*4096)	
+
+#define MIN_VBAT_OUTPUT_ALK	289		// 0.7 (0.7/3/3.3*4096)
 
 #define MIN_VBAT_1		1448				//  3.5/3 for LDO   3.5/3/3.3*4096
 

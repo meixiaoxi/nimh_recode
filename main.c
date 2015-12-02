@@ -165,11 +165,15 @@ do
 		//		gBatStateBuf[0] = 1;
 			if(gOutputStatus == OUTPUT_STATUS_NORMAL)
 			{
+				#if 0
 				gChargeCurrent_2 = getAverage(CHANNEL_20_RES);  // 放电电流
 
 				temp_min = MIN_VBAT_OUPUT - (3*gChargeCurrent_2) ;
 				if(temp_min < 289 || gChargingTimeTick[0] < 900)  //0.7   
 					temp_min = 289;
+				#endif
+
+				temp_min = MIN_VBAT_OUPUT;
 			}
 			else
 				temp_min = MIN_VBAT_OUTPUT_IDLE;
@@ -204,7 +208,19 @@ do
 					gChargeCurrent = 0;
 				else
 					gChargeCurrent = preVoltData[cur_detect_pos] -preVoltData[cur_detect_pos+1];
-				
+
+				if(gOutputStatus == OUTPUT_STATUS_WAIT)
+				{
+					if(gChargeCurrent >= BAT_VOLT_ALK_MIN)
+						gIsInTempProtect[cur_detect_pos]  = 1;  // alkline
+				}
+				#if 0
+				else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
+				{
+					if(gIsInTempProtect[cur_detect_pos] == 1)
+						temp_min = MIN_VBAT_OUTPUT_ALK;
+				}
+				#endif
 				if(gChargeCurrent < temp_min)
 				{
 					isVbatOk = 0;
@@ -215,6 +231,20 @@ do
 					}	
 				}	
 			}
+
+			if(gOutputStatus == OUTPUT_STATUS_WAIT)
+			{
+				if(preVoltData[BT_4] >= BAT_VOLT_ALK_MIN)
+						gIsInTempProtect[BT_4]  = 1;  // alkline
+			}
+			#if 0
+			else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
+			{
+				if(gIsInTempProtect[BT_4] == 1)
+					temp_min = MIN_VBAT_OUTPUT_ALK;
+			}
+			#endif
+			
 			if(preVoltData[BT_4] < temp_min)
 			{
 				isVbatOk = 0;
@@ -283,6 +313,11 @@ do
 					if(gOutputStatus == OUTPUT_STATUS_NORMAL)
 						gOutputStatus = OUTPUT_STATUS_STOP;
 
+					gIsInTempProtect[0] = 0;
+					gIsInTempProtect[1] = 0;					
+					gIsInTempProtect[2] = 0;
+					gIsInTempProtect[3] = 0;
+					
 					gChargingTimeTick[0] = 0;
 					if(gBatStateBuf[0])
 					{
