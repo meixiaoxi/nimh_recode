@@ -19,6 +19,8 @@ u16 preVoltData[4] ={0,0,0,0};
 
 u8 gErrorCount[4] = {0,0,0,0};
 
+u16 gPreOutPutCurrent = 0;
+
 u8 skipCount = 0;
 u16 isPwmOn = 0;
 
@@ -158,9 +160,10 @@ do
 	//if(gOutputStatus != OUTPUT_STATUS_STOP)
 	{
 		gDelayCount++;
-		if(gDelayCount>=20)
+		if(gDelayCount>=5)
 		{
 			gDelayCount=0;
+			gErrorCount[0] = 0;
 		//	if(gOutputStatus == OUTPUT_STATUS_WAIT)
 		//		gBatStateBuf[0] = 1;
 			if(gOutputStatus == OUTPUT_STATUS_NORMAL)
@@ -172,7 +175,41 @@ do
 				if(temp_min < 289 || gChargingTimeTick[0] < 900)  //0.7   
 					temp_min = 289;
 				#endif
+				temp_min = getAverage(CHANNEL_20_RES);
 
+				gErrorCount[2]++;   // 采样次数
+				
+				if(gErrorCount[0])  // 第一次
+				{
+					if(temp_min < gPreOutPutCurrent)
+					{
+						if((gPreOutPutCurrent - temp_min) > 10)
+							gErrorCount[1]++;
+					}
+					else
+					{
+						if((temp_min -gPreOutPutCurrent) > 10)
+							gErrorCount[1]++;
+					}
+					if(gErrorCount[2] >= 0xFF)
+					{
+						if(gErrorCount[1] >= 200)   // NG 次数
+						{
+							DISABLE_BOOST();
+							delay_ms(100);
+							ENABLE_BOOST();
+						}
+						gErrorCount[2] = 0;
+						gErrorCount[1] = 0;
+						gErrorCount[0] = 0;
+					}
+					gPreOutPutCurrent = temp_min;
+				}
+				else
+				{
+					gPreOutPutCurrent = temp_min;
+				}
+				
 				temp_min = MIN_VBAT_OUPUT;
 			}
 			else
@@ -184,11 +221,17 @@ do
 			preVoltData[BT_2] = getAverage(CHANNEL_VBAT_2);
 			preVoltData[BT_3] = getAverage(CHANNEL_VBAT_3);
 			preVoltData[BT_4] = getAverage(CHANNEL_VBAT_4);
-
-			if(gOutputStatus ==OUTPUT_STATUS_STOP)
+			
+			if(preVoltData[BT_1] < BAT_MIN_VOLT_OPEN || preVoltData[BT_2] < BAT_MIN_VOLT_OPEN || preVoltData[BT_3] < BAT_MIN_VOLT_OPEN || preVoltData[BT_4] < BAT_MIN_VOLT_OPEN)				   
 			{
-				if(preVoltData[BT_1] < BAT_MIN_VOLT_OPEN || preVoltData[BT_2] < BAT_MIN_VOLT_OPEN || preVoltData[BT_3] < BAT_MIN_VOLT_OPEN || preVoltData[BT_4] < BAT_MIN_VOLT_OPEN)				   
-					   gOutputStatus = OUTPUT_STATUS_WAIT;
+				if(gOutputStatus ==OUTPUT_STATUS_STOP)
+				{
+					gOutputStatus = OUTPUT_STATUS_WAIT;
+				}
+				else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
+					isVbatOk = 0;
+				LED_OFF(BT_1);LED_OFF(BT_2);LED_OFF(BT_3);LED_OFF(BT_4);
+				gBatStateBuf[0] = 1;
 			}
 
 			#ifdef EVT_BOARD
@@ -198,7 +241,7 @@ do
 			preVoltData[BT_4] = preVoltData[BT_4] /3;
 			#endif
 
-			if(preVoltData[BT_1] < MIN_VBAT_1 || preVoltData[BT_1] > 4000)   // 3.5V   10V
+			if(preVoltData[BT_1] < MIN_VBAT_1)   // 3.5V   10V
 			{
 				isVbatOk = 0;
 			}
@@ -223,13 +266,26 @@ do
 				#endif
 				if(gChargeCurrent < temp_min)
 				{
-					isVbatOk = 0;
+					
 					if(gOutputStatus == OUTPUT_STATUS_WAIT)
 					{
+						isVbatOk = 0;
 						if(gChargeCurrent < MIN_OUTPUT_DISPLAY_VOLT)
 							gBatStateBuf[0] = 1;
-					}	
-				}	
+					}
+					else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
+					{
+						gChargeSkipCount[cur_detect_pos]++;
+						if(gChargeSkipCount[cur_detect_pos] >=60)
+							isVbatOk = 0;
+					}
+					else
+					{
+						isVbatOk = 0;
+					}
+				}
+				else
+					gChargeSkipCount[cur_detect_pos] = 0;
 			}
 
 			if(gOutputStatus == OUTPUT_STATUS_WAIT)
@@ -247,13 +303,23 @@ do
 			
 			if(preVoltData[BT_4] < temp_min)
 			{
-				isVbatOk = 0;
 				if(gOutputStatus == OUTPUT_STATUS_WAIT)
 				{
+					isVbatOk = 0;
 					if(preVoltData[BT_4] < MIN_OUTPUT_DISPLAY_VOLT)
 						gBatStateBuf[0] = 1;
-				}	
+				}
+				else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
+				{
+					gChargeSkipCount[BT_4]++;
+					if(gChargeSkipCount[BT_4] >=60)
+						isVbatOk = 0;
+				}
+				else
+					isVbatOk = 0;
 			}
+			else
+				gChargeSkipCount[BT_4] = 0;
 			
 			if(skipCount == 0)  //温度正常
 			{
@@ -302,6 +368,7 @@ do
 				}
 				else
 				{
+					#if 0
 					if(skipCount == 0 && gOutputStatus == OUTPUT_STATUS_NORMAL)   //  temperature ok
 					{
 						if(gChargingTimeTick[0] < 10)
@@ -310,6 +377,8 @@ do
 							return;
 						}
 					}
+					#endif
+					
 					if(gOutputStatus == OUTPUT_STATUS_NORMAL)
 						gOutputStatus = OUTPUT_STATUS_STOP;
 
@@ -318,7 +387,7 @@ do
 					gIsInTempProtect[2] = 0;
 					gIsInTempProtect[3] = 0;
 					
-					gChargingTimeTick[0] = 0;
+					//gChargingTimeTick[0] = 0;
 					if(gBatStateBuf[0])
 					{
 						LED_OFF(BT_1),LED_OFF(BT_2),LED_OFF(BT_3),LED_OFF(BT_4);
@@ -389,6 +458,7 @@ void removeBat(u8 batNum)
 	LED_OFF(batNum);
 	gBatType[batNum] = 0;
 	gIsInTempProtect[batNum] = 0;
+	gErrorCount[batNum] = 0;
 	//PB &= 0xF0;   //close current pwm channel
 	if(batNum == gIsChargingBatPos)
 		PwmControl(PWM_OFF);
@@ -415,6 +485,7 @@ void removeAllBat()
 	RestTime[i] = 0;
 	gBatType[i] = 0;
 	gIsInTempProtect[i] = 0;
+	gErrorCount[i] = 0;
 	}
 
 	gCurrentLevel[0] = CURRENT_LEVEL_3;

@@ -153,7 +153,7 @@ typedef 	 unsigned long		u32;
 
 #define MIN_VBAT_OUTPUT_ALK	289		// 0.7 (0.7/3/3.3*4096)
 
-#define MIN_VBAT_1		1448				//  3.5/3 for LDO   3.5/3/3.3*4096
+#define MIN_VBAT_1		1406				//  3.4/3 for LDO   3.4/3/3.3*4096
 
 
 #define	MIN_OUTPUT_DISPLAY_VOLT	289	 // 0.7  0.7/3/3.3*4096
