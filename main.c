@@ -257,7 +257,7 @@ do
 					if(gChargeCurrent >= BAT_VOLT_ALK_MIN)
 						gIsInTempProtect[cur_detect_pos]  = 1;  // alkline
 				}
-				#if 0
+				#if 1
 				else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
 				{
 					if(gIsInTempProtect[cur_detect_pos] == 1)
@@ -293,7 +293,7 @@ do
 				if(preVoltData[BT_4] >= BAT_VOLT_ALK_MIN)
 						gIsInTempProtect[BT_4]  = 1;  // alkline
 			}
-			#if 0
+			#if 1
 			else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
 			{
 				if(gIsInTempProtect[BT_4] == 1)
