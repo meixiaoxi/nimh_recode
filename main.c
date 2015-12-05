@@ -996,10 +996,12 @@ void chargeHandler(void)
 					StatusChange(gIsChargingBatPos, STATE_BATTERY_TYPE_ERROR);
 					return;
 				}
+				#if 0   //mask here for hand touch may case error detect
 				else if(tempV >= BAT_HAS_BATTERY_VOLT)
 				{
 					gHasBat = 1;
 				}
+				#endif
 				if(gIsChargingBatPos == BT_1)
 					gHasBat = 0;
 			}
