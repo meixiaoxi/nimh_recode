@@ -228,7 +228,7 @@ do
 			preVoltData[BT_3] = getAverage(CHANNEL_VBAT_3);
 			preVoltData[BT_4] = getAverage(CHANNEL_VBAT_4);
 			
-			if(preVoltData[BT_1] < BAT_MIN_VOLT_OPEN || preVoltData[BT_2] < BAT_MIN_VOLT_OPEN || preVoltData[BT_3] < BAT_MIN_VOLT_OPEN || preVoltData[BT_4] < BAT_MIN_VOLT_OPEN)				   
+			if(preVoltData[BT_1] < BAT_MIN_VOLT_NO_BATTERY|| preVoltData[BT_2] < BAT_MIN_VOLT_NO_BATTERY || preVoltData[BT_3] < BAT_MIN_VOLT_NO_BATTERY || preVoltData[BT_4] < BAT_MIN_VOLT_NO_BATTERY_CHANNEL_4)				   
 			{
 				if(gOutputStatus ==OUTPUT_STATUS_STOP)
 				{
@@ -270,6 +270,13 @@ do
 						temp_min = MIN_VBAT_OUTPUT_ALK;
 				}
 				#endif
+				if(gChargeCurrent < BAT_MIN_VOLT_NO_BATTERY)
+				{
+					isVbatOk = 0;
+					if(gOutputStatus == OUTPUT_STATUS_STOP)
+						gOutputStatus = OUTPUT_STATUS_WAIT;
+						
+				}
 				if(gChargeCurrent < temp_min)
 				{
 					
@@ -783,7 +790,10 @@ void FastCharge(u8 batNum)
 				if((gBatVoltArray[batNum] - tempV) > ADC_DV_VOLT)
 				{
 					if(tempV < DV_ENABLE_MIN_VOLT)
+					{
+						dropCount[batNum] = 0;
 						return;
+					}
 					dropCount[batNum]++;
 					if(dropCount[batNum] >3)
 					{
