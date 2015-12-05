@@ -148,6 +148,12 @@ void FindTwoBattery()
 			}
 		}
 		gIsInTwoState =1;
+
+		//here for that during two battery state, other battery's voltage may drop, and may casuse error -dv
+		if(gNowTwoBuf[0] < BT_NULL)
+			gBatVoltArray[gNowTwoBuf[0]] = getVbatAdc(gNowTwoBuf[0]);
+		if(gNowTwoBuf[1] < BT_NULL)
+			gBatVoltArray[gNowTwoBuf[1]] = getVbatAdc(gNowTwoBuf[1]);
 	}
 }
 #if 1
