@@ -55,6 +55,7 @@ u8 gHasBat = 0;
 u8 gIsInTempProtect[4] = {0,0,0,0};
 u8 tryUpDnCurrent[2] = {UP_CURRENT,UP_CURRENT};
 u8 tryCount =0;
+u8 noCurrentCount[4] = {0,0,0,0};
 
 extern u8 ledDisplayCount;
 extern u8 gLedStatus;
@@ -472,6 +473,7 @@ void removeBat(u8 batNum)
 	gBatType[batNum] = 0;
 	gIsInTempProtect[batNum] = 0;
 	gErrorCount[batNum] = 0;
+	noCurrentCount[batNum] = 0;
 	//PB &= 0xF0;   //close current pwm channel
 	if(batNum == gIsChargingBatPos)
 		PwmControl(PWM_OFF);
@@ -499,6 +501,7 @@ void removeAllBat()
 	gBatType[i] = 0;
 	gIsInTempProtect[i] = 0;
 	gErrorCount[i] = 0;
+	noCurrentCount[i] = 0;
 	}
 
 	gCurrentLevel[0] = CURRENT_LEVEL_3;
@@ -916,6 +919,7 @@ void chargeHandler(void)
 	u16 tempT,tempV,temp_2;
 	u8 battery_state = gBatStateBuf[gIsChargingBatPos];
 	static u8 chargingTime = 0;
+
 	u8 chargeCurrent = 0,temp_3;
 
 	if(gChargingStatus == SYS_CHARGE_WAIT_TO_PICK_BATTERY)
@@ -1083,6 +1087,7 @@ void chargeHandler(void)
 				else if(battery_state == STATE_NORMAL_CHARGING)
 				{
 					tempV = getVbatAdc(gIsChargingBatPos);
+
 					if(tempV > BAT_ZERO_SPEC_VOLT)
 					{
 						StatusChange(gIsChargingBatPos, STATE_DEAD_BATTERY);
@@ -1122,13 +1127,23 @@ void chargeHandler(void)
 						if(tempV > temp_2)
 						{
 							gErrorCount[gIsChargingBatPos]++;
-							if(gErrorCount[gIsChargingBatPos] >=3)
+						}
+						if(gCurrentNow == CURRENT_LEVEL_1)
+						{
+							if(gChargeCurrent_2 < 3)
 							{
-								PwmControl(PWM_OFF);
-								StatusChange(gIsChargingBatPos,STATE_BATTERY_TYPE_ERROR);
-								gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
-								return;
+								noCurrentCount[gIsChargingBatPos]++;
 							}
+							else
+								noCurrentCount[gIsChargingBatPos] = 0;
+						}
+
+						if(gErrorCount[gIsChargingBatPos] >=3 || noCurrentCount[gIsChargingBatPos] >=3)
+						{
+							PwmControl(PWM_OFF);
+							StatusChange(gIsChargingBatPos,STATE_BATTERY_TYPE_ERROR);
+							gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
+							return;
 						}
 						#ifdef DVT_BOARD
 						if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
