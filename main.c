@@ -1,5 +1,6 @@
 #include "MC96F8316.h"
 #include "nimh.h"
+#include "intrins.h"
 
 u8 gPreChargingBatPos = BT_NULL;
 u32 shortTick=0;
@@ -1578,7 +1579,7 @@ void main()
 {
 	u8 cur_detect_pos=1;
 	OSCCR = 0x20;		// internal OSC 8MHz
-	BITCR = 0x4E;		// BIT 16.384ms
+	BITCR = 0x2E;		// BIT 16.384ms
 
 	delay_ms(16);
 
@@ -1598,10 +1599,11 @@ void main()
 	ADCCRL  = 0x90;
 
 	//interrupt
-	IE = 0x00;
+	IE = 0x20;
 	IE1 = 0x00;
 	IE2 = 0x02;    //enable timer0 overflow 
 	IE3 = 0x00;
+	EIPOL0L = 0x02;    // interrupt EINT0 on falling edge	
 	EIFLAG0 = 0;
 	EIFLAG1 = 0;
 	IIFLAG = 0;
@@ -1627,7 +1629,7 @@ void main()
 		CHANGE_TO_OUTPUT();
 	}
 	delay_ms(100);
-	
+
 	while(1)
 	{
 		shortTick =0;
@@ -1675,3 +1677,9 @@ void T0_Int_Handler(void) interrupt 13
 {
 	shortTick = 1;
 }
+
+void Ext0_Int_hnadler(void) interrupt 5
+{
+	EIFLAG0 = 0;
+}
+
