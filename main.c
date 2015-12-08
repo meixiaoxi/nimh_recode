@@ -1643,8 +1643,8 @@ void main()
 
 			chargeHandler();
 
-			if(gPreChargingBatPos < BT_NULL)
-				PreChargeBatHandler();
+			//if(gPreChargingBatPos < BT_NULL)
+				//PreChargeBatHandler();
 		}
 		else    //output handler
 		{
@@ -1658,6 +1658,11 @@ void main()
 		do{
 			ClrWdt();
 			}while(shortTick == 0);
+		if(gSysStatus == SYS_CHARGING_STATE)
+		{
+			if(gPreChargingBatPos < BT_NULL)
+				PreChargeBatHandler();
+		}
 
 	}
 	
