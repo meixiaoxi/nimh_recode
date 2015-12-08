@@ -133,7 +133,7 @@ typedef 	 unsigned long		u32;
 
 #define CHARGING_FAST_TEMP_END_VOLT	1799			// (1.45/3.3)*4096
 
-#define DV_ENABLE_MIN_VOLT		1774						//  (1.43/3.3)*4096
+#define DV_ENABLE_MIN_VOLT		1837						//  (1.48/3.3)*4096
 #define BAT_VOLT_CHANGE_FASTER	1750						//  (1.41/3.3)*4096
 
 #define BAT_VOLT_ALK_MIN		620				// 1.5	(1.5/3/3.3*4096)
