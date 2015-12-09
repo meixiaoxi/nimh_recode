@@ -712,6 +712,8 @@ void FastCharge(u8 batNum)
 			gNearFullTimeTick[batNum]++;
 		else if(gNearFullTimeTick[batNum] < 50)
 			gNearFullTimeTick[batNum] = 0;
+		else
+			gNearFullTimeTick[batNum]++;
 	}
 	else if(gPreCurrent== CURRENT_LEVEL_2)
 	{
@@ -724,6 +726,8 @@ void FastCharge(u8 batNum)
 				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 3;
 			else if(gNearFullTimeTick[batNum] < 50)
 				gNearFullTimeTick[batNum] = 0;
+			else 
+				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 3;
 		}
 	}
 	else
@@ -737,6 +741,8 @@ void FastCharge(u8 batNum)
 				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 4;
 			else if(gNearFullTimeTick[batNum] < 50)
 				gNearFullTimeTick[batNum] = 0;
+			else
+				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 4;
 		}
 	}
 	}
@@ -749,6 +755,8 @@ void FastCharge(u8 batNum)
 			gNearFullTimeTick[batNum]++;
 		else if(gNearFullTimeTick[batNum] < 50)
 			gNearFullTimeTick[batNum] = 0;
+		else
+			gNearFullTimeTick[batNum]++;
 	}
 	else if(gPreCurrent== CURRENT_LEVEL_2)
 	{
@@ -761,6 +769,8 @@ void FastCharge(u8 batNum)
 				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 12;
 			else if(gNearFullTimeTick[batNum] < 50)
 				gNearFullTimeTick[batNum] = 0;
+			else
+				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 12;
 		}
 	}
 	else
@@ -774,6 +784,8 @@ void FastCharge(u8 batNum)
 				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 5;
 			else if(gNearFullTimeTick[batNum] < 50)
 				gNearFullTimeTick[batNum] = 0;
+			else
+				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 5;
 		}
 	}		
 	}
