@@ -288,7 +288,7 @@ do
 					if(gOutputStatus == OUTPUT_STATUS_WAIT)
 					{
 						isVbatOk = 0;
-						if(gChargeCurrent < MIN_OUTPUT_DISPLAY_VOLT)
+						if(gChargeCurrent < BAT_MIN_VOLT_NO_BATTERY)
 							gBatStateBuf[0] = 1;
 					}
 					else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
@@ -324,7 +324,7 @@ do
 				if(gOutputStatus == OUTPUT_STATUS_WAIT)
 				{
 					isVbatOk = 0;
-					if(preVoltData[BT_4] < MIN_OUTPUT_DISPLAY_VOLT)
+					if(preVoltData[BT_4] < BAT_MIN_VOLT_NO_BATTERY)
 					{
 						gBatStateBuf[0] = 1;
 						no_battery = 1;
