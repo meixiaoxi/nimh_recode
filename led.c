@@ -126,6 +126,10 @@ else
 
 	gIsInTwoState++;
 	
+
+	#if 1
+	if(gOutputStatus == OUTPUT_STATUS_NORMAL)
+	{	
 	if(gBatStateBuf[0] ==0)
 	{
 		if(gIsInTwoState > 100)
@@ -139,11 +143,7 @@ else
 			LED_ON(BT_1);LED_ON(BT_2);LED_ON(BT_3);LED_ON(BT_4);
 		}
 		return;
-	}
-
-	#if 1
-	if(gOutputStatus == OUTPUT_STATUS_NORMAL)
-	{	
+	}	
 		/*********
 		gIsFisrtChangeLevel[1]用于轮流闪开始的标志
 		gIsFisrtChangeLevel[2]用于表示当前处于亮灯状态的灯

@@ -240,7 +240,7 @@ do
 				else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
 					isVbatOk = 0;
 				LED_OFF(BT_1);LED_OFF(BT_2);LED_OFF(BT_3);LED_OFF(BT_4);
-				gBatStateBuf[0] = 1;
+				gBatStateBuf[0] = 0;
 				no_battery = 1;
 			}
 
@@ -288,8 +288,6 @@ do
 					if(gOutputStatus == OUTPUT_STATUS_WAIT)
 					{
 						isVbatOk = 0;
-						if(gChargeCurrent < BAT_MIN_VOLT_NO_BATTERY)
-							gBatStateBuf[0] = 1;
 					}
 					else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
 					{
@@ -326,7 +324,6 @@ do
 					isVbatOk = 0;
 					if(preVoltData[BT_4] < BAT_MIN_VOLT_NO_BATTERY)
 					{
-						gBatStateBuf[0] = 1;
 						no_battery = 1;
 					}
 				}
@@ -403,16 +400,14 @@ do
 					if(gOutputStatus == OUTPUT_STATUS_NORMAL || no_battery == 0)
 						gOutputStatus = OUTPUT_STATUS_STOP;
 
-					gIsInTempProtect[0] = 0;
-					gIsInTempProtect[1] = 0;					
-					gIsInTempProtect[2] = 0;
-					gIsInTempProtect[3] = 0;
+					for(cur_detect_pos = BT_1; cur_detect_pos <=BT_4; cur_detect_pos++)
+					{
+						gIsInTempProtect[cur_detect_pos] = 0;
+						gChargeSkipCount[cur_detect_pos] = 0;
+					}
 					
 					//gChargingTimeTick[0] = 0;
-					if(gBatStateBuf[0])
-					{
-						LED_OFF(BT_1),LED_OFF(BT_2),LED_OFF(BT_3),LED_OFF(BT_4);
-					}
+					LED_OFF(BT_1),LED_OFF(BT_2),LED_OFF(BT_3),LED_OFF(BT_4);
 					DISABLE_BOOST();
 				}				
 		}		
@@ -1689,13 +1684,10 @@ void main()
 			{
 				if(getAverage(CHANNEL_VIN_5V) < VIN_5V_NO_EXIST)
 				{
-					if(gBatStateBuf[0])
-					{
-						LED_ALL_OFF();
-						DISABLE_BOOST();
-						PCON = 0x03;
-						NOP();NOP();NOP();
-					}
+					LED_ALL_OFF();
+					DISABLE_BOOST();
+					PCON = 0x03;
+					NOP();NOP();NOP();
 				}
 			}
 		}
