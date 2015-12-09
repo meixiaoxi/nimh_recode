@@ -144,7 +144,7 @@ typedef 	 unsigned long		u32;
 #define BAT_LEVEL_23_CHARGING		1725		// 1.39    (1.39/3.3*4096)
 #define BAT_LEVEL_34_CHARGING		1747		// 1.408   (1.408/3.3*4096)
 
-#define BAT_INITIAL_VOLT_FULL		1837		// 1.48(1.48/3.3*4096)
+#define BAT_INITIAL_VOLT_FULL		1849		// 1.49(1.49/3.3*4096)
 
 //output
 #define MIN_VBAT_CHANNEL_1_IDLE	 1944  //(4.7/3=2.4V   2.4/3.3*4096)
@@ -178,7 +178,8 @@ typedef 	 unsigned long		u32;
 #define VIN_5V_TEST_MIN		972				// 4.7	(4.7/6/3.3*4096)
 
 #define VIN_5V_MINUM			951			// 4.6  (4.6/6/3.3*4096)
-#define BAT_VOLT_NEAR_FULL		1812			// 1.46  1.46/3.3*4096
+#define BAT_VOLT_NEAR_FULL		1824			// 1.47  1.47/3.3*4096
+#define BAT_VOLT_NEAR_FULL_AAA		1849				// 1.49
 #define VIN_5V_NO_EXIST			827				// 4 (4/6/3.3*4096)
 
 #define BAT_START_FAST_CHARGE		1750		// 1.41  1.41/3.3*4096

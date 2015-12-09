@@ -700,7 +700,7 @@ void FastCharge(u8 batNum)
 {
 	u16 tempV,tempT;
 	u32 overTimer = BAT_CHARGING_FAST_MAX_COUNT;
-
+	
 	tempV = getVbatAdc(batNum);
 
 	if(gBatType[batNum] != BAT_AAA_TYPE)
@@ -745,7 +745,7 @@ void FastCharge(u8 batNum)
 	if(gPreCurrent== CURRENT_LEVEL_1)	
 	{
 		gChargingTimeTick[batNum]++;
-		if(tempV > BAT_VOLT_NEAR_FULL)
+		if(tempV > BAT_VOLT_NEAR_FULL_AAA)
 			gNearFullTimeTick[batNum]++;
 		else if(gNearFullTimeTick[batNum] < 50)
 			gNearFullTimeTick[batNum] = 0;
@@ -757,7 +757,7 @@ void FastCharge(u8 batNum)
 		{
 			gChargingTimeTick[batNum] = gChargingTimeTick[batNum]+12;
 			gSmallModeCount[batNum] = 0;
-			if(tempV > BAT_VOLT_NEAR_FULL)
+			if(tempV > BAT_VOLT_NEAR_FULL_AAA)
 				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 12;
 			else if(gNearFullTimeTick[batNum] < 50)
 				gNearFullTimeTick[batNum] = 0;
@@ -770,7 +770,7 @@ void FastCharge(u8 batNum)
 		{
 			gChargingTimeTick[batNum] = gChargingTimeTick[batNum]+5;
 			gSmallModeCount[batNum] = 0;
-			if(tempV > BAT_VOLT_NEAR_FULL)
+			if(tempV > BAT_VOLT_NEAR_FULL_AAA)
 				gNearFullTimeTick[batNum] = gNearFullTimeTick[batNum] + 5;
 			else if(gNearFullTimeTick[batNum] < 50)
 				gNearFullTimeTick[batNum] = 0;
