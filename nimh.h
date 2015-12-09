@@ -16,6 +16,7 @@ typedef 	 unsigned long		u32;
 #define		sei()		do{IE |=  0x80;}while(0)
 #define		NOP()		_nop_()
 #define 		ClrWdt()		WDTCR = 0xE0
+#define LED_ALL_OFF()	LED_OFF(BT_1),LED_OFF(BT_2),LED_OFF(BT_3),LED_OFF(BT_4)
 #ifdef EVT_BOARD
 #warning "evt version"
 #define 		GET_SYS_STATUS()	P1&0x01
@@ -177,6 +178,7 @@ typedef 	 unsigned long		u32;
 
 #define VIN_5V_MINUM			951			// 4.6  (4.6/6/3.3*4096)
 #define BAT_VOLT_NEAR_FULL		1812			// 1.46  1.46/3.3*4096
+#define VIN_5V_NO_EXIST			827				// 4 (4/6/3.3*4096)
 
 #define BAT_START_FAST_CHARGE		1750		// 1.41  1.41/3.3*4096
 
