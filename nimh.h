@@ -375,7 +375,7 @@ typedef 	 unsigned long		u32;
 #define BAT_NEAR_FULL_MAX_COUNT			1200		// 4min (4*60*1000/500)
 
 
-#define TRICKLE_CHARGE_COUNT		6000	// 20min  (20*60*1000/200   )
+#define TRICKLE_CHARGE_COUNT		9000	// 30min  (30*60*1000/200   )
 
 #define FAST_SKIP_COUNT	0
 #define SUP_SKIP_COUNT		0
