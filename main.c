@@ -57,6 +57,7 @@ u8 gIsInTempProtect[4] = {0,0,0,0};
 u8 tryUpDnCurrent[2] = {UP_CURRENT,UP_CURRENT};
 u8 tryCount =0;
 u8 noCurrentCount[4] = {0,0,0,0};
+u16 idata gDnCurrentTick[2] = {0,0};
 
 extern u8 ledDisplayCount;
 extern u8 gLedStatus;
@@ -859,8 +860,8 @@ void FastCharge(u8 batNum)
 // 0 input  1 output
 void setCurrent(u8 level)
 {
-	if(gCurrentNow == level)
-		return;
+	//if(gCurrentNow == level)
+		//return;
 	
 	if(level == CURRENT_LEVEL_1) // ‰»Î∏ﬂ◊Ë     2A 900mA
 	{
@@ -968,6 +969,7 @@ void chargeHandler(void)
 			}
 			if(gChargeChildStatus[gIsChargingBatPos] == CHARGE_STATE_PRE)
 				chargeCurrent = CURRENT_LEVEL_3;
+			tryCount = 0;
 		}
 		else if(battery_state == STATE_BATTERY_TYPE_ERROR)
 		{
@@ -1159,40 +1161,6 @@ void chargeHandler(void)
 							gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
 							return;
 						}
-						#ifdef DVT_BOARD
-						if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
-							temp_3 = 0;
-						else
-							temp_3 = 1;
-							
-						temp_2 = getAverage(CHANNEL_VIN_5V);
-						if(temp_2 < VIN_5V_MINUM)
-						{
-							temp_2 = getAverage(CHANNEL_VIN_5V);
-							if(temp_2 < VIN_5V_MINUM)
-							{
-								tryCount++;
-								//if(tryCount > 7)
-								{
-									if(gCurrentLevel[temp_3] < CURRENT_LEVEL_3)
-										gCurrentLevel[temp_3]++;
-									tryUpDnCurrent[temp_3] = DN_CURRENT;
-									tryCount = 0;
-								}
-							}
-						}
-						else
-						{
-							if(tryUpDnCurrent[temp_3] == UP_CURRENT)
-							{
-								if(gCurrentLevel[temp_3] > CURRENT_LEVEL_1)
-								{
-									gCurrentLevel[temp_3]--;
-								}
-							}
-							tryCount = 0;
-						}
-						#endif
 					}
 					PwmControl(PWM_OFF);
 					if(gPreChargingBatPos != BT_NULL)  //wait for Pre battery detect finish
@@ -1200,7 +1168,25 @@ void chargeHandler(void)
 						gDelayCount = 1;
 						return;
 					}
-					
+					#ifdef DVT_BOARD
+					if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
+						temp_3 = 0;
+					else
+						temp_3 = 1;
+					if(tryUpDnCurrent[temp_3] == UP_CURRENT)
+					{
+						if(gCurrentLevel[temp_3] > CURRENT_LEVEL_1)
+						{
+							gCurrentLevel[temp_3]--;
+						}
+					}
+					else if(tryUpDnCurrent[temp_3] == DN_CURRENT)
+					{
+						gDnCurrentTick[temp_3]++;
+						if(gDnCurrentTick[temp_3] > 1500)
+							tryUpDnCurrent[temp_3] = UP_CURRENT;
+					}
+					#endif
 					gPreChargingBatPos = gIsChargingBatPos;
 					gPreCurrent = gCurrentNow;
 					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
@@ -1222,6 +1208,52 @@ void chargeHandler(void)
 				{
 					PwmControl(PWM_OFF);
 					gChargingStatus = SYS_CHARGE_WAIT_TO_PICK_BATTERY;
+				}
+			}
+			else if(battery_state == STATE_NORMAL_CHARGING)
+			{
+				if(tryCount != 100)
+				{
+					if(gIsInTempProtect[gIsChargingBatPos] || gChargeChildStatus[gIsChargingBatPos] == CHARGE_STATE_PRE)
+						return;
+					
+						#ifdef DVT_BOARD
+						if(gBatType[gIsChargingBatPos] == BAT_AAA_TYPE)
+							temp_3 = 0;
+						else
+							temp_3 = 1;
+							
+						temp_2 = getVin5V();
+						if(temp_2 < VIN_5V_MINUM)
+						{
+							//temp_2 = getAverage(CHANNEL_VIN_5V);
+							//if(temp_2 < VIN_5V_MINUM)
+							{
+								tryCount++;
+								if(tryCount > 2)
+								{
+									if(gCurrentLevel[temp_3] < CURRENT_LEVEL_3)
+										gCurrentLevel[temp_3]++;
+									tryUpDnCurrent[temp_3] = DN_CURRENT;
+									gDnCurrentTick[temp_3] = 0;
+									tryCount = 100;
+								}
+							}
+						}
+						#if 0
+						else
+						{
+							if(tryUpDnCurrent[temp_3] == UP_CURRENT)
+							{
+								if(gCurrentLevel[temp_3] > CURRENT_LEVEL_1)
+								{
+									gCurrentLevel[temp_3]--;
+								}
+							}
+							tryCount = 0;
+						}
+						#endif
+						#endif
 				}
 			}
 		}

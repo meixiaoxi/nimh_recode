@@ -89,6 +89,37 @@ u16 getAverage(u8 channel)
 	return (ret - max - min)>>3;
 }
 
+#if 1
+u16 getVin5V(void)
+{
+	u8 i;
+	u16 temp,max,min,ret;
+
+
+	temp = getAdcValue(CHANNEL_VIN_5V);
+	ret= temp;
+	max =temp;
+	min = temp;
+	for(i=0;i<3;i++)
+	{
+		//delay_us(100);
+		 temp = getAdcValue(CHANNEL_VIN_5V);
+	 	if(temp > max)
+	 	{
+			max = temp;
+	 	}
+
+		 if(temp < min)
+		{
+			min = temp;
+	 	}
+	 	ret += temp;
+	}
+	
+
+	return (ret - max - min)>>1;
+}
+#endif
 u16 getBatTemp(u8 batNum)
 {
 	u16 tempT;

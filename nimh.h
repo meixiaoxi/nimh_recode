@@ -430,6 +430,7 @@ u16 getAdcValue(u8 channel);
 u16 getVbatAdc(u8 channel);
 u16 getAverage(u8 channel);
 u16 getBatTemp(u8 batNum);
+u16 getVin5V(void);
 
 void send(u16 sData);
 void sendStr(char str[]);
