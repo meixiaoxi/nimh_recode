@@ -191,21 +191,21 @@ typedef 	 unsigned long		u32;
 #define TEST_VOLT_YUNFANG_MAX	3847				// 3  (3.1/3.3*4096)
 
 //temperature adc
-#define 	ADC_TEMP_MAX	1203    //50
+#define 	ADC_TEMP_MAX	1121    //53
 #define	ADC_TEMP_MIN	3177	//-5
 
-#define ADC_TEMP_DOWN_CURRENT  1289	//47
+#define ADC_TEMP_DOWN_CURRENT  1203	// 50
 
-#define ADC_TEMP_MAX_RECOVERY    1509	  //40
-#define ADC_TEMP_MIN_RECOVERY	    3077	 // -2
+#define ADC_TEMP_MAX_RECOVERY    1260	  // 48
+#define ADC_TEMP_MIN_RECOVERY	    3111	 // -3
 
 
 //output temp
 #define ADC_TEMP_OUTPUT_MAX	   839       //65
 #define ADC_TEMP_OUTPUT_MIN	   3331		 // -10
 
-#define ADC_TEMP_OUTPUT_MAX_RECOVERY	   948       //60
-#define ADC_TEMP_OUTPUT_MIN_RECOVERY	   3177		 // -5
+#define ADC_TEMP_OUTPUT_MAX_RECOVERY	   881       //63
+#define ADC_TEMP_OUTPUT_MIN_RECOVERY	   3271		 // -8
 
 
 //factory test
