@@ -905,8 +905,8 @@ u8 EnterTrickleCharge()
 			continue;
 		if(gBatStateBuf[batNum] == STATE_NORMAL_CHARGING)
 		{
-			fitCount++;
-			if(fitCount > 1)
+			//fitCount++;
+			//if(fitCount > 1)
 				return 0;
 		}
 	}
