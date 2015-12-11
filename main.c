@@ -578,6 +578,7 @@ void StatusCheck()
 #define	BAT_AAA_TYPE	1
 void StatusChange(u8 batNum, u8 statusNow)
 {
+	u8 batPos;
 	if(batNum == gPreChargingBatPos)
 		gPreChargingBatPos = BT_NULL;
 	if(statusNow == STATE_DEAD_BATTERY)
@@ -587,6 +588,18 @@ void StatusChange(u8 batNum, u8 statusNow)
 	else		
 		gBatStateBuf[batNum] = statusNow;
 
+	if(gIsInTwoState)
+	{
+		for(batPos = BT_1; batPos<=BT_4; batPos++)
+		{
+			ClrWdt();
+			if((batPos == batNum) || (batPos == gNowTwoBuf[0]) || (batPos == gNowTwoBuf[1]))
+				continue;
+			if(gBatStateBuf[batPos] == STATE_DEAD_BATTERY)
+				continue;
+			gBatVoltArray[batPos] = getVbatAdc(batPos);
+		}
+	}
 	gIsInTwoState = 0;
 }
 
@@ -815,7 +828,7 @@ void FastCharge(u8 batNum)
 						return;
 					}
 					dropCount[batNum]++;
-					if(dropCount[batNum] >3)
+					if(dropCount[batNum] >10)
 					{
 						StatusChange(batNum,STATE_BATTERY_FULL);
 						gChargingTimeTick[batNum] = 0;

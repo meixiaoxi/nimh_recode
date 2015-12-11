@@ -182,8 +182,8 @@ typedef 	 unsigned long		u32;
 #define VIN_5V_TEST_MIN		972				// 4.7	(4.7/6/3.3*4096)
 
 #define VIN_5V_MINUM			3425			// 4.6  (4.6*3/5/3.3*4096)
-#define BAT_VOLT_NEAR_FULL		1824			// 1.47  1.47/3.3*4096
-#define BAT_VOLT_NEAR_FULL_AAA		1849				// 1.49
+#define BAT_VOLT_NEAR_FULL		1812			// 1.46  1.46/3.3*4096
+#define BAT_VOLT_NEAR_FULL_AAA		1824				// 1.47
 #define VIN_5V_NO_EXIST			827				// 4 (4/6/3.3*4096)
 
 #define BAT_START_FAST_CHARGE		1750		// 1.41  1.41/3.3*4096
