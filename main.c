@@ -534,6 +534,7 @@ void StatusCheck()
 			{
 				if(gSysStatus != (GET_SYS_STATUS()))
 				{
+					EIPOL0L = 0x06; // interrupt EINT0 on falling edge	EINT1 on rising edge
 					gSysStatus = SYS_DISCHARGE_STATE;
 					CHANGE_TO_OUTPUT();
 					gOutputStatus = OUTPUT_STATUS_WAIT;				
@@ -549,6 +550,7 @@ void StatusCheck()
 			}
 			else
 			{
+				EIPOL0L = 0x00;
 				DISABLE_BOOST();
 				gSysStatus = SYS_CHARGING_STATE;
 				CHANGE_TO_INPUT();
@@ -1648,7 +1650,7 @@ void main()
 	IE1 = 0x00;
 	IE2 = 0x02;    //enable timer0 overflow 
 	IE3 = 0x00;
-	EIPOL0L = 0x06;    // interrupt EINT0 on falling edge	EINT1 on rising edge
+	EIPOL0L = 0x00;
 	EIFLAG0 = 0;
 	EIFLAG1 = 0;
 	IIFLAG = 0;
@@ -1672,6 +1674,7 @@ void main()
 		gDelayCount = 50;
 		gHasBat = 0;
 		CHANGE_TO_OUTPUT();
+		EIPOL0L = 0x06;   // interrupt EINT0 on falling edge	EINT1 on rising edge
 	}
 	delay_ms(100);
 
@@ -1720,7 +1723,10 @@ void main()
 					DISABLE_BOOST();
 					CHANGE_TO_IO();
 					PCON = 0x03;
-					NOP();NOP();NOP();
+					NOP();
+					NOP();
+					NOP();
+					NOP();
 					CHANGE_TO_VIN5V();
 				}
 			}
