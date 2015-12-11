@@ -17,6 +17,10 @@ typedef 	 unsigned long		u32;
 #define		NOP()		_nop_()
 #define 		ClrWdt()		WDTCR = 0xE0
 #define LED_ALL_OFF()	LED_OFF(BT_1),LED_OFF(BT_2),LED_OFF(BT_3),LED_OFF(BT_4)
+
+#define CHANGE_TO_IO()		P0FSR &= 0xEF
+#define CHANGE_TO_VIN5V()	P0FSR |= 0x10
+
 #ifdef EVT_BOARD
 #warning "evt version"
 #define 		GET_SYS_STATUS()	P1&0x01

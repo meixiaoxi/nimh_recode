@@ -1648,7 +1648,7 @@ void main()
 	IE1 = 0x00;
 	IE2 = 0x02;    //enable timer0 overflow 
 	IE3 = 0x00;
-	EIPOL0L = 0x02;    // interrupt EINT0 on falling edge	
+	EIPOL0L = 0x06;    // interrupt EINT0 on falling edge	EINT1 on rising edge
 	EIFLAG0 = 0;
 	EIFLAG1 = 0;
 	IIFLAG = 0;
@@ -1718,8 +1718,10 @@ void main()
 				{
 					LED_ALL_OFF();
 					DISABLE_BOOST();
+					CHANGE_TO_IO();
 					PCON = 0x03;
 					NOP();NOP();NOP();
+					CHANGE_TO_VIN5V();
 				}
 			}
 		}
