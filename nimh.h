@@ -186,7 +186,7 @@ typedef 	 unsigned long		u32;
 #define BAT_VOLT_NEAR_FULL_AAA		1824				// 1.47
 #define VIN_5V_NO_EXIST			827				// 4 (4/6/3.3*4096)
 
-#define BAT_START_FAST_CHARGE		1750		// 1.41  1.41/3.3*4096
+#define BAT_START_FAST_CHARGE		1775		// 1.43  1.43/3.3*4096
 
 #define BAT_REMOVE_VOLT		868
 
@@ -376,7 +376,7 @@ typedef 	 unsigned long		u32;
 #define BAT_CHARGING_FAST_MAX_COUNT_AAA	15900	// 53min   (53*60*1000/500)   800/900
 
 #define BAT_INITIAL_FULL_CHECK_COUNT		600		// 2min  (90*1000/500)
-#define BAT_NEAR_FULL_MAX_COUNT			1200		// 4min (4*60*1000/500)
+#define BAT_NEAR_FULL_MAX_COUNT			900		// 3min (3*60*1000/500)
 
 
 #define TRICKLE_CHARGE_COUNT		9000	// 30min  (30*60*1000/200   )
