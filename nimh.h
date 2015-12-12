@@ -148,7 +148,7 @@ typedef 	 unsigned long		u32;
 #define BAT_LEVEL_23_CHARGING		1725		// 1.39    (1.39/3.3*4096)
 #define BAT_LEVEL_34_CHARGING		1747		// 1.408   (1.408/3.3*4096)
 
-#define BAT_INITIAL_VOLT_FULL		1824		// 1.47(1.47/3.3*4096)
+#define BAT_INITIAL_VOLT_FULL		1824		//  1.47(1.47/3.3*4096)
 
 //output
 #define MIN_VBAT_CHANNEL_1_IDLE	 1944  //(4.7/3=2.4V   2.4/3.3*4096)
