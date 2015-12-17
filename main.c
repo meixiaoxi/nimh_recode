@@ -1605,7 +1605,7 @@ void InitConfig()
        				  //-     -      -      -      Vin5V_DET   CHG_DISCHG    NTC2     led3         
     P0IO    = 0xF1;         // out     out    out     out        input              input           input       out                 (0:input   1:output)
     P0OD    = 0x00;        // -      pp     pp      pp            PP                PP               pp            pp                    (0:push-pull   1:open-drain)
-    P0PU    = 0x70;         // -      on      on       on           off                off             off           off                  (0:disable      1:enable)               
+    P0PU    = 0x00;         // -      on      on       on           off                off             off           off                  (0:disable      1:enable)               
     P0        = 0x01;	        // -      -       -         -              0              0                0               1
     P03DB   = 0x00;       // 0       0      0       0               0              0                 0              0
     P0FSR   = 0x12;       // 0      0      0       1               0              0                   1            0
@@ -1613,7 +1613,7 @@ void InitConfig()
                                     //-     V4+_DET    NTC1   V2+_DET   V1+_DET   GND_ALL   V3+_DET   GND_ALL2
     P1IO    = 0x80;         // out      input        input        input         input          input           input             inut
     P1OD    = 0x00;        // pp        PP           PP           pp             PP             PP             PP                 pp
-    P1PU    = 0x80;        // on        off          off           off            off             off            off                 off
+    P1PU    = 0x00;        // on        off          off           off            off             off            off                 off
     P1	  = 0x00;        // 00000000
     P12DB   = 0x00;       // 00000000
     P1FSRH  = 0x2A;      // 00       10            10            10
@@ -1622,7 +1622,7 @@ void InitConfig()
                                     //-    -  boost_en     v1+_h_ctl   pwm4   -         -      -
     P2IO    = 0x4F;         //-   out     out               input         out    out     out     out
     P2OD    = 0x00;         // -   PP      PP              PP             PP      PP      pp     pp
-    P2PU    = 0x47;         // -    on     off              off             off     on      on     on
+    P2PU    = 0x00;         // -    on     off              off             off     on      on     on
     P2	  = 0x00;		    // -      -      1      1      -      -      -      -
     P2FSR   = 0x00;	   //             00000000
 
@@ -1732,6 +1732,9 @@ void main()
 			{
 				if(getAverage(CHANNEL_VIN_5V) < VIN_5V_NO_EXIST)
 				{
+					P3IO |= 0x44;
+					P32 = 0;
+					P36 = 0;
 					LED_ALL_OFF();
 					DISABLE_BOOST();
 					CHANGE_TO_IO();
