@@ -21,7 +21,6 @@ u16 preVoltData[4] ={0,0,0,0};
 u8 gErrorCount[4] = {0,0,0,0};
 
 u16 gPreOutPutCurrent = 0;
-u16 idata gPreOutPutCurrent_2;
 
 u8 skipCount = 0;
 u16 isPwmOn = 0;
@@ -213,7 +212,6 @@ do
 				}
 				else
 				{
-					gPreOutPutCurrent_2 = temp_min;
 					RestTime[0] = 1;
 					RestTime[1] = 0;
 				}
