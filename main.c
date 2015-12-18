@@ -844,7 +844,7 @@ void FastCharge(u8 batNum)
 			 {
 			 	gIsInTempProtect[batNum] = 1;
 			 }
-			 if(gIsInTempProtect[batNum])
+			 else if(gIsInTempProtect[batNum])
 			 {
 			 	if(tempT > ADC_TEMP_MAX_RECOVERY)
 					gIsInTempProtect[batNum] = 0;
@@ -859,11 +859,21 @@ void FastCharge(u8 batNum)
 		{
 			StatusChange(batNum,STATE_BATTERY_FULL);	
 			gChargingTimeTick[batNum] = 0;
+			return;
 		}
 		
 		if(tempT < ADC_TEMP_MAX || tempT > ADC_TEMP_MIN )
 		{
 			StatusChange(batNum,STATE_BATTERY_TEMPERATURE_ERROR);
+		}
+		 else if(tempT < ADC_TEMP_DOWN_CURRENT)
+		{
+		 	gIsInTempProtect[batNum] = 1;
+		}
+		else if(gIsInTempProtect[batNum])
+		{
+		 	if(tempT > ADC_TEMP_MAX_RECOVERY)
+				gIsInTempProtect[batNum] = 0;		
 		}
 	}
 
