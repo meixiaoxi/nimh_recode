@@ -34,8 +34,8 @@ typedef 	 unsigned long		u32;
 #warning "dvt version"
 #define		GET_SYS_STATUS()	P0&0x04
 
-#define		CHANGE_TO_OUTPUT()	(P2IO |= (1<<4),P24 = 0)
-#define		CHANGE_TO_INPUT()		(P2IO &=~(1<<4))
+#define		CHANGE_TO_OUTPUT()	NOP() //(P2IO |= (1<<4),P24 = 0)
+#define		CHANGE_TO_INPUT()		NOP() //(P2IO &=~(1<<4))
 
 #define SYS_CHARGING_STATE	0x00
 #define SYS_DISCHARGE_STATE	0x04

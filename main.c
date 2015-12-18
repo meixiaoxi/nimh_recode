@@ -1819,10 +1819,10 @@ void InitConfig()
      P1FSRL  = 0x55;	 //                                                      010              10            10                 1 
     
                                     //-    -  boost_en     v1+_h_ctl   pwm4   -         -      -
-    P2IO    = 0x4F;         //-   out     out               input         out    out     out     out
+    P2IO    = 0x5F;         //-   out     out               output         out    out     out     out
     P2OD    = 0x00;         // -   PP      PP              PP             PP      PP      pp     pp
     P2PU    = 0x00;         // -    on     off              off             off     on      on     on
-    P2	  = 0x00;		    // -      -      1      1      -      -      -      -
+    P2	  = 0x10;		    // -      -      1      1      -      -      -      -
     P2FSR   = 0x00;	   //             00000000
 
                                      //led4    cur_ctl2    led1    led2    pwm3    CUR_CTL    pwm2   pwm1
@@ -1934,6 +1934,7 @@ void main()
 					P3IO |= 0x44;
 					P32 = 0;
 					P36 = 0;
+					P24 = 0;
 					LED_ALL_OFF();
 					DISABLE_BOOST();
 					CHANGE_TO_IO();
@@ -1943,6 +1944,7 @@ void main()
 					NOP();
 					NOP();
 					CHANGE_TO_VIN5V();
+					P24 = 1;
 				}
 			}
 		}
