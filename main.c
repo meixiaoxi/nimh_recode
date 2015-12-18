@@ -21,6 +21,7 @@ u16 preVoltData[4] ={0,0,0,0};
 u8 gErrorCount[4] = {0,0,0,0};
 
 u16 gPreOutPutCurrent = 0;
+u16 idata gPreOutPutCurrent_2;
 
 u8 skipCount = 0;
 u16 isPwmOn = 0;
@@ -186,6 +187,36 @@ do
 					temp_min = 289;
 				#endif
 				temp_min = getAverage(CHANNEL_20_RES);
+
+				if(RestTime[0])
+				{
+					if(temp_min <= 5)
+					{
+						gChargingTimeTick[1]++;
+						RestTime[1] = 0;
+						if(gChargingTimeTick[1] > 0x107AC0)
+						{
+							DISABLE_BOOST();
+							LED_ALL_OFF();
+							RestTime[0] = 0;
+							gOutputStatus = OUTPUT_STATUS_STOP;
+							gChargingTimeTick[1] = 0;
+							return;
+						}
+					}
+					else
+					{
+						RestTime[1]++;
+						if(RestTime[1]>=3)
+							gChargingTimeTick[1] = 0;
+					}
+				}
+				else
+				{
+					gPreOutPutCurrent_2 = temp_min;
+					RestTime[0] = 1;
+					RestTime[1] = 0;
+				}
 
 				gErrorCount[2]++;   // 采样次数
 				
@@ -399,7 +430,11 @@ do
 					#endif
 					
 					if(gOutputStatus == OUTPUT_STATUS_NORMAL || no_battery == 0)
+					{
 						gOutputStatus = OUTPUT_STATUS_STOP;
+						gChargingTimeTick[1] = 0;
+						RestTime[0] = 0;
+					}
 
 					for(cur_detect_pos = BT_1; cur_detect_pos <=BT_4; cur_detect_pos++)
 					{
