@@ -1401,34 +1401,43 @@ do{
 	P0IO |= 0x04;  //set chg_dischg to output
 	P02 = 1;   //output 0 to lwo mos
 	delay_ms(10);
-	
+#if 0	
 	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_1);
 	if(gBatVoltArray[0] > TEST_3V3_VOLT_MAX || gBatVoltArray[0] < TEST_3V3_VOLT_MIN)
 		break;
+#endif
 	gDetectRemovePos++;
-	
+
+#if 0	
 	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_2);
 	if(gBatVoltArray[0] > TEST_3V3_VOLT_MAX || gBatVoltArray[0] < TEST_3V3_VOLT_MIN)
 		break;
+#endif
 	gDetectRemovePos++;
 
+#if 0
 	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_3);
 	if(gBatVoltArray[0] > TEST_3V3_VOLT_MAX || gBatVoltArray[0] < TEST_3V3_VOLT_MIN)
 		break;
+#endif
+
 	gDetectRemovePos++;
 
+#if 0
 	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_4);
 	if(gBatVoltArray[0] > TEST_3V3_VOLT_MAX || gBatVoltArray[0] < TEST_3V3_VOLT_MIN)
 		break;
+#endif
+
 	gDetectRemovePos++;
 
 // 2.8V ok?
+	gIsChargingBatPos = BT_1;
 	PwmControl(PWM_ON);
-	delay_ms(10);
+	delay_ms(100);
 
 	gBatVoltArray[0] = getVbatAdc(BT_1);
 	PwmControl(PWM_OFF);
-	delay_ms(10);
 
 	P02 = 0;
 	P0IO &= 0xFB;  //set chg_dischg to input
@@ -1443,9 +1452,13 @@ do{
 	
 	gDetectRemovePos++;
 
+//	P2IO |= (1<<4);
+//	P24 = 1;
+//	delay_ms(100);
 	gBatVoltArray[0] = getBatTemp(BT_1);
 	if(gBatVoltArray[0] > 2172  || gBatVoltArray[0]  < 1923)  // 1.65 +/- 0.1V
 		break;
+
 	gDetectRemovePos++;
 	gBatVoltArray[0] = getBatTemp(BT_3);
 	if(gBatVoltArray[0] > 2172  || gBatVoltArray[0]  < 1923)
@@ -1485,7 +1498,10 @@ do{
 				delay_ms(10);
 				gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
 				if(gChargeCurrent_2 > 7) // we haven't open MOS, so should not have current
+				{
+					fitCount[gIsChargingBatPos] =1;
 					break;
+				}
 				PwmControl(PWM_ON);
 				delay_ms(200);
 				if(testlevel == 1)   //  1.9 - 2.3A     700 -1000   20 /30
@@ -1617,10 +1633,10 @@ do{
 			{
 				if(gDetectRemovePos <= 8)
 				{
-					if(gDetectRemovePos & (1<<(gIsChargingBatPos-1)))
-						LED_ON(5-gIsChargingBatPos);
+					if(gDetectRemovePos & (1<<(gIsChargingBatPos)))
+						LED_ON(BT_4-gIsChargingBatPos);
 					else
-						LED_OFF(5-gIsChargingBatPos);
+						LED_OFF(BT_4-gIsChargingBatPos);
 				}
 				else
 				{
