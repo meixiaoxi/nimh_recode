@@ -194,6 +194,9 @@ typedef 	 unsigned long		u32;
 #define TEST_VOLT_YUNFANG_MIN		3227			// 2.6 (2.6/3.3*4096)
 #define TEST_VOLT_YUNFANG_MAX	3847				// 3  (3.1/3.3*4096)
 
+#define TEST_3V3_VOLT_MAX			1415				//  1.137 1.14     1.14/3.3*4096
+#define TEST_3V3_VOLT_MIN			1316					// 1.063 1.06      1.06/3.3*4096
+
 //temperature adc
 #define 	ADC_TEMP_MAX	1121    //53
 #define	ADC_TEMP_MIN	3177	//-5

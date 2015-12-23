@@ -1398,6 +1398,45 @@ void factoryTest()
 	}
 	
 do{
+	P0IO |= 0x04;  //set chg_dischg to output
+	P02 = 1;   //output 0 to lwo mos
+	delay_ms(10);
+	
+	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_1);
+	if(gBatVoltArray[0] > TEST_3V3_VOLT_MAX || gBatVoltArray[0] < TEST_3V3_VOLT_MIN)
+		break;
+	gDetectRemovePos++;
+	
+	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_2);
+	if(gBatVoltArray[0] > TEST_3V3_VOLT_MAX || gBatVoltArray[0] < TEST_3V3_VOLT_MIN)
+		break;
+	gDetectRemovePos++;
+
+	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_3);
+	if(gBatVoltArray[0] > TEST_3V3_VOLT_MAX || gBatVoltArray[0] < TEST_3V3_VOLT_MIN)
+		break;
+	gDetectRemovePos++;
+
+	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_4);
+	if(gBatVoltArray[0] > TEST_3V3_VOLT_MAX || gBatVoltArray[0] < TEST_3V3_VOLT_MIN)
+		break;
+	gDetectRemovePos++;
+
+// 2.8V ok?
+	PwmControl(PWM_ON);
+	delay_ms(10);
+
+	gBatVoltArray[0] = getVbatAdc(BT_1);
+	PwmControl(PWM_OFF);
+	delay_ms(10);
+
+	P02 = 0;
+	P0IO &= 0xFB;  //set chg_dischg to input
+
+	if(gBatVoltArray[0] > TEST_VOLT_YUNFANG_MAX|| gBatVoltArray[0] < TEST_VOLT_YUNFANG_MIN)  // 2.8 +/- 0.2
+		break;
+	gDetectRemovePos++;
+	
 	gBatVoltArray[0] = getAverage(CHANNEL_VIN_5V);
 	if(gBatVoltArray[0] > VIN_5V_TEST_MAX || gBatVoltArray[0] < VIN_5V_TEST_MIN)
 		break;
@@ -1413,23 +1452,7 @@ do{
 		break;
 	gDetectRemovePos++;
 
-// 2.8V ok?
-	gIsChargingBatPos = BT_1;
-	P0IO |= 0x04;  //set chg_dischg to output
-	P02 = 1;   //output 0 to lwo mos
-	PwmControl(PWM_ON);
-	delay_ms(10);
-
-	gBatVoltArray[0] = getVbatAdc(BT_1);
-	PwmControl(PWM_OFF);
-	delay_ms(10);
-	
-	P0IO &= 0xFB;  //set chg_dischg to input
 	gIsChargingBatPos = 1;
-	
-	if(gBatVoltArray[0] > TEST_VOLT_YUNFANG_MAX|| gBatVoltArray[0] < TEST_VOLT_YUNFANG_MIN)  // 2.8 +/- 0.2
-		break;
-	gDetectRemovePos++;
 	
 	for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 	{
@@ -1568,7 +1591,7 @@ do{
 			{
 				if(skipCount)
 				{
-					if(fitCount[gIsChargingBatPos] !=0 || gDetectRemovePos <=4)  // >3 means vin5V and NTC and yunfang 2.8V all ok
+					if(fitCount[gIsChargingBatPos] !=0 || gDetectRemovePos <=8)  // >8 means vin5V and NTC and yunfang 2.8V all ok
 					{
 						LED_ON(gIsChargingBatPos);
 					}
@@ -1592,14 +1615,19 @@ do{
 		{
 			for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 			{
-				if(gDetectRemovePos <= 4)
+				if(gDetectRemovePos <= 8)
 				{
-					LED_ON(gDetectRemovePos -1);;
+					if(gDetectRemovePos & (1<<(gIsChargingBatPos-1)))
+						LED_ON(5-gIsChargingBatPos);
+					else
+						LED_OFF(5-gIsChargingBatPos);
 				}
 				else
 				{
 					if(fitCount[gIsChargingBatPos] == 1)
 						LED_ON(gIsChargingBatPos);
+					else
+						LED_OFF(gIsChargingBatPos);
 				}
 			}
 		}
