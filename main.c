@@ -1395,17 +1395,33 @@ void factoryTest()
 	{
 		gSysStatus = GET_SYS_STATUS();
 		ClrWdt();
+		if(P3 & 0x20)
+			LED_ON(BT_1);
+		else
+			LED_OFF(BT_1);
+		delay_ms(100);
 	}
 	
 do{
 
-	for(gIsChargingBatPos = BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
+	P2IO |= (1<<5);
+	P25 = 0;
+
+	P0IO |= 0x04;  //set chg_dischg to output
+	P02 = 1;   //output 0 to lwo mos
+	delay_ms(10);
+
+	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_1);
+	if(gBatVoltArray[0] < VBAT_IDLE_VOLT_3V3_MIN || gBatVoltArray[0] > VBAT_IDLE_VOLT_3V3_MAX)	
+		break;
+	gDetectRemovePos++;
+
+	P2IO &= ~(1<<5);   // boost en to input
+	
+	for(gIsChargingBatPos = BT_2; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 	{
 		switch(gIsChargingBatPos)
 		{
-			case BT_1:
-					isFromOutput = CHANNEL_VBAT_1;
-					break;
 			case BT_2:
 					isFromOutput = CHANNEL_VBAT_2;
 					break;
@@ -1425,11 +1441,6 @@ do{
 
 	if(gIsChargingBatPos <= BT_4)
 		break;
-	
-	P0IO |= 0x04;  //set chg_dischg to output
-	P02 = 1;   //output 0 to lwo mos
-	delay_ms(10);
-
 
 	for(gIsChargingBatPos = BT_1; gIsChargingBatPos <= BT_3; gIsChargingBatPos++)
 	{
@@ -1684,6 +1695,7 @@ do{
 
 P02 = 0;
 P0IO &= 0xFB;  //set chg_dischg to input
+P2IO &= ~(1<<5);
 
 	while(1)
 	{
@@ -1704,7 +1716,7 @@ P0IO &= 0xFB;  //set chg_dischg to input
 			{
 				if(skipCount)
 				{
-					if(fitCount[gIsChargingBatPos] !=0 || gDetectRemovePos <=7)  // >8 means vin5V and NTC and yunfang 2.8V all ok
+					if(fitCount[gIsChargingBatPos] !=0 || gDetectRemovePos <=11)  // >8 means vin5V and NTC and yunfang 2.8V all ok
 					{
 						LED_ON(gIsChargingBatPos);
 					}
@@ -1728,7 +1740,7 @@ P0IO &= 0xFB;  //set chg_dischg to input
 		{
 			for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 			{
-				if(gDetectRemovePos <= 7)
+				if(gDetectRemovePos <= 11)
 				{
 					if(gDetectRemovePos & (1<<(gIsChargingBatPos)))
 						LED_ON(BT_4-gIsChargingBatPos);

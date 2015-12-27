@@ -202,6 +202,8 @@ typedef 	 unsigned long		u32;
 
 
 #define VBAT_IDLE_VOLT_MAX		62					// 0.05V 0.05/3.3*4096
+#define VBAT_IDLE_VOLT_3V3_MIN	581			// 3V 3/(150/(150+300+510))/3.3*4096
+#define VBAT_IDLE_VOLT_3V3_MAX    	659			// 3.4V  3.4/(150/(150+300+510))/3.3*4096
 
 //temperature adc
 #define 	ADC_TEMP_MAX	1121    //53
