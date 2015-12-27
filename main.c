@@ -187,6 +187,8 @@ do
 				#endif
 				temp_min = getAverage(CHANNEL_20_RES);
 
+				#ifdef SAMPLE_OUTPUT_CURRENT_SUPPORT
+				just error detect
 				if(RestTime[0])
 				{
 					if(temp_min <= 5)
@@ -215,6 +217,7 @@ do
 					RestTime[0] = 1;
 					RestTime[1] = 0;
 				}
+				#endif
 
 				gErrorCount[2]++;   // 采样次数
 				
