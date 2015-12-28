@@ -1559,9 +1559,9 @@ do{
 		break;
 	gDetectRemovePos++;
 
-	P2IO |= (1<<4);
-	P24 = 1;
-	delay_ms(100);
+//	P2IO |= (1<<4);
+//	P24 = 1;
+//	delay_ms(100);
 	gBatVoltArray[0] = getBatTemp(BT_1);
 	if(gBatVoltArray[0] > 2172  || gBatVoltArray[0]  < 1923)  // 1.65 +/- 0.1V
 		break;
