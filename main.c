@@ -1843,7 +1843,7 @@ void main()
 
 	delay_ms(16);
 
-	LVRCR  = 0x0E;                      // builtin reset 2.75V set, LVRCR.0=0 enable !!!
+	LVRCR  = 0x02;                      // builtin reset 2.0V set, LVRCR.0=0 enable !!!
 
 	InitConfig();
 
