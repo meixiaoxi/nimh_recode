@@ -1415,7 +1415,7 @@ do{
 	delay_ms(10);
 
 	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_1);
-	if(gBatVoltArray[0] < VBAT_IDLE_VOLT_3V3_MIN || gBatVoltArray[0] > VBAT_IDLE_VOLT_3V3_MAX)	
+	if(gBatVoltArray[0] < VBAT_IDLE_VOLT_3V3_MIN)	
 		break;
 	gDetectRemovePos++;
 
@@ -1445,9 +1445,10 @@ do{
 	if(gIsChargingBatPos <= BT_4)
 		break;
 
+	LED_ON(BT_3);
+	delay_ms(10);
 	for(gIsChargingBatPos = BT_1; gIsChargingBatPos <= BT_3; gIsChargingBatPos++)
 	{
-		PwmControl(PWM_ON);
 		switch(gIsChargingBatPos)
 		{
 			case BT_1:
@@ -1460,15 +1461,15 @@ do{
 					isFromOutput = CHANNEL_VBAT_3;
 					break;
 		}
-		delay_ms(50);
 	
 		gBatVoltArray[0] = getAverage(isFromOutput);
-		PwmControl(PWM_OFF);
-		if(gBatVoltArray[0] > TEST_VOLT_YUNFANG_MAX || gBatVoltArray[0] < TEST_VOLT_YUNFANG_MIN)
+
+		if(gBatVoltArray[0] > TEST_DIVIDE_1V3_MAX|| gBatVoltArray[0] < TEST_DIVIDE_1V3_MIN)
 			break;
 		gDetectRemovePos++;
 	}
 
+	LED_OFF(BT_3);
 	if(gIsChargingBatPos <= BT_3)
 		break;
 
@@ -1478,7 +1479,7 @@ do{
 	
 	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_4);
 	PwmControl(PWM_OFF);
-	if(gBatVoltArray[0] > TEST_VOLT_YUNFANG_MAX_4 || gBatVoltArray[0] < TEST_VOLT_YUNFANG_MIN_4)
+	if(gBatVoltArray[0] < TEST_VOLT_YUNFANG_MIN_4)
 		break;
 
 	gDetectRemovePos++;
