@@ -175,7 +175,7 @@ typedef 	 unsigned long		u32;
 #define 	BAT_LEVEL_32_IDLE		1576      //  1.27 (1.27/3.3*4096)
 #define   BAT_LEVEL_21_IDLE		1551	//  1.25 (1.25/3.3*4096)
 
-#define BAT_ZERO_SPEC_VOLT		3103		// 2.5 (2.5/3.3*4096) 
+#define BAT_ZERO_SPEC_VOLT		2854		// 2.3 (2.3/3.3*4096) 
 
 
 #define VIN_5V_TEST_MAX		3872			// 3.12V   3.12/3.3*4096
