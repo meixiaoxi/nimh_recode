@@ -194,8 +194,8 @@ typedef 	 unsigned long		u32;
 #define TEST_VOLT_YUNFANG_MIN		1075			// 2.6 (2.6/3/3.3*4096)
 #define TEST_VOLT_YUNFANG_MAX	1241				// 3  (3.1/3/3.3*4096)
 
-#define TEST_DIVIDE_1V3_MIN	2035				// 1.64   1.64/3.3*4096
-#define TEST_DIVIDE_1V3_MAX	2097					//  1.69	1.69/3.3*4096
+#define TEST_DIVIDE_1V3_MIN	2033				// 1.638   1.638/3.3*4096
+#define TEST_DIVIDE_1V3_MAX	2102					//  1.694	1.694/3.3*4096
 
 #define TEST_VOLT_YUNFANG_MIN_4		2854			// 2.3 (2.3/3/3.3*4096)
 #define TEST_VOLT_YUNFANG_MAX_4		3723				// 3  (3.1/3/3.3*4096)
