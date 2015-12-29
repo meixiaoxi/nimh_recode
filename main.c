@@ -1612,7 +1612,7 @@ do{
 				}
 				PwmControl(PWM_ON);
 				delay_ms(200);
-				if(testlevel == 1)   //  1.9 - 2.3A     700 -1000   20 /30
+				if(testlevel == 1)   //  1.9 - 2.4A     700 -1000   20 /30
 				{
 					if(gIsChargingBatPos == BT_4)
 					{
@@ -1622,7 +1622,7 @@ do{
 					else
 					{
 						preVoltData[0] = 2482;    // 2V   1.9+ 1.9*90ohm
-						preVoltData[1] = 3103;    // 2.5V  2.3 + 2.3*90ohm
+						preVoltData[1] = 3247;    // 2.616V  2.4 + 2.4*90ohm
 					}
 					gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
 					if(gBatVoltArray[gIsChargingBatPos] >preVoltData[1] || gBatVoltArray[gIsChargingBatPos] < preVoltData[0] )  // µç³ØÍ¨µÀADC

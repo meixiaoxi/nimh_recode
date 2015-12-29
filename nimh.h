@@ -194,8 +194,8 @@ typedef 	 unsigned long		u32;
 #define TEST_VOLT_YUNFANG_MIN		1075			// 2.6 (2.6/3/3.3*4096)
 #define TEST_VOLT_YUNFANG_MAX	1241				// 3  (3.1/3/3.3*4096)
 
-#define TEST_DIVIDE_1V3_MIN	2033				// 1.638   1.638/3.3*4096
-#define TEST_DIVIDE_1V3_MAX	2102					//  1.694	1.694/3.3*4096
+#define TEST_DIVIDE_1V3_MIN	2020				// 1.628   1.628/3.3*4096
+#define TEST_DIVIDE_1V3_MAX	2117					//  1.705	1.705/3.3*4096
 
 #define TEST_VOLT_YUNFANG_MIN_4		2854			// 2.3 (2.3/3/3.3*4096)
 #define TEST_VOLT_YUNFANG_MAX_4		3723				// 3  (3.1/3/3.3*4096)
@@ -227,11 +227,11 @@ typedef 	 unsigned long		u32;
 
 
 //factory test
- //   1.9 - 2.3A     700 -1000   20 /30       38mV~ 46mV    35mv~50mV 
+ //   1.9 - 2.4A     700 -1000   20 /30       38mV~ 48mV    35mv~50mV 
   //  600 - 1000     200 - 500	20/30    12mV~30mV      10mV~25mV		
   // 100 - 600   50 -300               20/30        2mV~12mV     2mV ~15mV
 
-#define CURRENT_MAX_LEVEL_1		57			//46mV   46/3300*4096	
+#define CURRENT_MAX_LEVEL_1		60			//48mV   48/3300*4096	
 #define CURRENT_MIN_LEVEL_1             47                    //38      38/3300*4096
 
 #define CURRENT_MAX_LEVEL_2		37			// 30mV   30/3300*4096
