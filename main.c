@@ -1393,6 +1393,7 @@ void factoryTest()
 	u8 testlevel = 1;
 	gDetectRemovePos = 1;
 
+/*
 	gSysStatus = GET_SYS_STATUS();
 	while(gSysStatus != SYS_CHARGING_STATE)
 	{
@@ -1404,6 +1405,7 @@ void factoryTest()
 			LED_OFF(BT_1);
 		delay_ms(100);
 	}
+	*/
 	
 do{
 
@@ -1412,11 +1414,30 @@ do{
 
 	P0IO |= 0x04;  //set chg_dischg to output
 	P02 = 1;   //output 0 to lwo mos
-	delay_ms(10);
+	delay_ms(1000);
+
+
+	gBatVoltArray[0] = getAverage(CHANNEL_VIN_5V);
+	if(gBatVoltArray[0] > VIN_5V_TEST_MAX || gBatVoltArray[0] < VIN_5V_TEST_MIN)
+		break;
+	gDetectRemovePos++;
+
+
+	P1FSRH = 0x22;
+	P1IO |= (1<<5);
+	P15 = 0;
+	P02 = 0;
+	delay_ms(20);
 
 	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_1);
+
+	P1IO &= ~(1<<5);
+	P1FSRH = 0x2A;
+	P02 = 1;
+	
 	if(gBatVoltArray[0] < VBAT_IDLE_VOLT_3V3_MIN)	
 		break;
+
 	gDetectRemovePos++;
 
 	P2IO &= ~(1<<5);   // boost en to input
@@ -1446,7 +1467,7 @@ do{
 		break;
 
 	LED_ON(BT_3);
-	delay_ms(10);
+	delay_ms(60);
 	for(gIsChargingBatPos = BT_1; gIsChargingBatPos <= BT_3; gIsChargingBatPos++)
 	{
 		switch(gIsChargingBatPos)
@@ -1473,11 +1494,21 @@ do{
 	if(gIsChargingBatPos <= BT_3)
 		break;
 
-	gIsChargingBatPos = BT_4;
+	gIsChargingBatPos = BT_2;
 	PwmControl(PWM_ON);
 	delay_ms(50);
+
+
+	P1FSRH = 0x22;
+	P1IO |= (1<<5);
+	P15 = 0;
+	P02 = 0;
+	delay_ms(20);
+
 	
-	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_4);
+	gBatVoltArray[0] = getAverage(CHANNEL_VBAT_2);
+	P1IO &= ~(1<<5);
+	P1FSRH = 0x2A;
 	PwmControl(PWM_OFF);
 	if(gBatVoltArray[0] < TEST_VOLT_YUNFANG_MIN_4)
 		break;
@@ -1537,7 +1568,7 @@ do{
 #endif
 
 	P02 = 0;
-	P0IO &= 0xFB;  //set chg_dischg to input
+	//P0IO &= 0xFB;  //set chg_dischg to input
 #if 0
 // 2.8V ok?
 	gIsChargingBatPos = BT_1;
@@ -1554,15 +1585,13 @@ do{
 		break;
 	gDetectRemovePos++;
 #endif
-	
-	gBatVoltArray[0] = getAverage(CHANNEL_VIN_5V);
-	if(gBatVoltArray[0] > VIN_5V_TEST_MAX || gBatVoltArray[0] < VIN_5V_TEST_MIN)
-		break;
-	gDetectRemovePos++;
+
 
 //	P2IO |= (1<<4);
 //	P24 = 1;
 //	delay_ms(100);
+
+	delay_ms(50);
 	gBatVoltArray[0] = getBatTemp(BT_1);
 	if(gBatVoltArray[0] > 2172  || gBatVoltArray[0]  < 1923)  // 1.65 +/- 0.1V
 		break;
@@ -1574,6 +1603,10 @@ do{
 	gDetectRemovePos++;
 
 	gIsChargingBatPos = 1;
+
+	P1FSRH = 0x22;
+	P1IO |= (1<<5);
+	P15 = 1;
 	
 	for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 	{
@@ -1616,13 +1649,13 @@ do{
 				{
 					if(gIsChargingBatPos == BT_4)
 					{
-						preVoltData[0] = 947;      // 0.763  0.7 + 0.7*90ohm
+						preVoltData[0] = 806;      // 0.65 0.65
 						preVoltData[1] = 1352;    // 1.09          1 + 1*90ohm
 					}
 					else
 					{
-						preVoltData[0] = 2482;    // 2V   1.9+ 1.9*90ohm
-						preVoltData[1] = 3247;    // 2.616V  2.4 + 2.4*90ohm
+						preVoltData[0] = 2358;    // 1.9V   1.9+ 1.9*90ohm
+						preVoltData[1] = 3351;    //   2.7 2.616V  2.4 + 2.4*90ohm
 					}
 					gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
 					if(gBatVoltArray[gIsChargingBatPos] >preVoltData[1] || gBatVoltArray[gIsChargingBatPos] < preVoltData[0] )  // µç³ØÍ¨µÀADC
@@ -1697,9 +1730,14 @@ do{
 }while(0);
 
 
-P02 = 0;
-P0IO &= 0xFB;  //set chg_dischg to input
+P02 = 1;
+//P0IO &= 0xFB;  //set chg_dischg to input
 P2IO &= ~(1<<5);
+
+P1FSRH = 0x22;
+P1IO |= (1<<5);
+P15 = 0;
+
 
 	while(1)
 	{
@@ -1714,6 +1752,7 @@ P2IO &= ~(1<<5);
 			LED_OFF(BT_1);LED_OFF(BT_2);LED_OFF(BT_3);LED_OFF(BT_4);
 		}
 		gSysStatus = GET_SYS_STATUS();
+		/*
 		if(gSysStatus == SYS_CHARGING_STATE)
 		{
 			for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
@@ -1741,7 +1780,10 @@ P2IO &= ~(1<<5);
 				skipCount=1;
 		}
 		else
+		*/
 		{
+			if(gDetectRemovePos <= 11)
+			{
 			for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
 			{
 				if(gDetectRemovePos <= 11)
@@ -1753,11 +1795,42 @@ P2IO &= ~(1<<5);
 				}
 				else
 				{
+					//LED_ON(gIsChargingBatPos);
+
+					/*
 					if(fitCount[gIsChargingBatPos] == 1)
 						LED_ON(gIsChargingBatPos);
 					else
 						LED_OFF(gIsChargingBatPos);
+						*/
 				}
+			}
+			}
+			else
+			{
+					for(gIsChargingBatPos=BT_1; gIsChargingBatPos <= BT_4; gIsChargingBatPos++)
+					{
+						if(skipCount)
+						{
+							if(fitCount[gIsChargingBatPos] !=0)  // >8 means vin5V and NTC and yunfang 2.8V all ok
+							{
+								LED_ON(gIsChargingBatPos);
+							}
+							else
+							{
+								LED_OFF(gIsChargingBatPos);
+							}
+						}
+						else
+						{
+							LED_ON(gIsChargingBatPos);
+						}
+					}
+					delay_ms(150);
+					if(skipCount)
+						skipCount=0;
+					else
+						skipCount=1;
 			}
 		}
 		ClrWdt();
