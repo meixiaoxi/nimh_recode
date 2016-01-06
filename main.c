@@ -571,6 +571,7 @@ void StatusCheck()
 				if(gSysStatus != (GET_SYS_STATUS()))
 				{
 					EIPOL0L = 0x06; // interrupt EINT0 on falling edge	EINT1 on rising edge
+					P03DB = 0x43;
 					gSysStatus = SYS_DISCHARGE_STATE;
 					CHANGE_TO_OUTPUT();
 					gOutputStatus = OUTPUT_STATUS_WAIT;				
@@ -587,6 +588,7 @@ void StatusCheck()
 			else
 			{
 				EIPOL0L = 0x00;
+				P03DB = 0x40;
 				DISABLE_BOOST();
 				gSysStatus = SYS_CHARGING_STATE;
 				CHANGE_TO_INPUT();
@@ -1880,7 +1882,7 @@ void InitConfig()
     P0OD    = 0x00;        // -      pp     pp      pp            PP                PP               pp            pp                    (0:push-pull   1:open-drain)
     P0PU    = 0x00;         // -      on      on       on           off                off             off           off                  (0:disable      1:enable)               
     P0        = 0x01;	        // -      -       -         -              0              0                0               1
-    P03DB   = 0x00;       // 0       0      0       0               0              0                 0              0
+    P03DB   = 0x40;       // 0       0      0       0               0              0                 0              0
     P0FSR   = 0x12;       // 0      0      0       1               0              0                   1            0
 
                                     //-     V4+_DET    NTC1   V2+_DET   V1+_DET   GND_ALL   V3+_DET   GND_ALL2
@@ -1960,6 +1962,7 @@ void main()
 		gDelayCount = 50;
 		gHasBat = 0;
 		CHANGE_TO_OUTPUT();
+		P03DB = 0x43;
 		EIPOL0L = 0x06;   // interrupt EINT0 on falling edge	EINT1 on rising edge
 	}
 	delay_ms(100);
