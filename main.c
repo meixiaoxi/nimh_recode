@@ -1207,6 +1207,8 @@ void chargeHandler(void)
 						{
 							gErrorCount[gIsChargingBatPos]++;
 						}
+						else
+							gErrorCount[gIsChargingBatPos] = 0;
 						if(gCurrentNow == CURRENT_LEVEL_1)
 						{
 							if(gChargeCurrent_2 < 3)
@@ -1217,7 +1219,7 @@ void chargeHandler(void)
 								noCurrentCount[gIsChargingBatPos] = 0;
 						}
 
-						if(gErrorCount[gIsChargingBatPos] >=3 || noCurrentCount[gIsChargingBatPos] >=3)
+						if(gErrorCount[gIsChargingBatPos] >=3 || noCurrentCount[gIsChargingBatPos] >=20)
 						{
 							PwmControl(PWM_OFF);
 							StatusChange(gIsChargingBatPos,STATE_BATTERY_TYPE_ERROR);
