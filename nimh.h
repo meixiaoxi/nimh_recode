@@ -153,6 +153,7 @@ typedef 	 unsigned long		u32;
 //output
 #define MIN_VBAT_CHANNEL_1_IDLE	 1944  //(4.7/3=2.4V   2.4/3.3*4096)
 #define MIN_VBAT_OUPUT				351	//(0.85/3=0.283	0.3/3.3*4096)
+#define MIN_VBAT_OUTPUT_CHANNEL_4	372	// 0.9/3=0.3      0.3/3.3*4096
 #define MIN_VBAT_OUTPUT_IDLE		455	// (1.1/3 = 0.366  0.366/3.3*4096)
 #define	OUTPUT_SHOW_LEVEL_3		537	//(1.3/3  0.65/3.3*4096 )
 #define	OUTPUT_SHOW_LEVEL_2		517	//(1.25/3 0.625/3.3*4096)	

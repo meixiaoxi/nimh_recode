@@ -347,6 +347,7 @@ do
 			{
 				if(gIsInTempProtect[BT_4] == 1)
 					temp_min = MIN_VBAT_OUTPUT_ALK;
+				temp_min = MIN_VBAT_OUTPUT_CHANNEL_4;
 			}
 			#endif
 			
