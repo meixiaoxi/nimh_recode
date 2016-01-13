@@ -702,7 +702,7 @@ void batteryDetect(u8 batNum,u16 tempV)
 	else
 		isPwmOn = BAT_MAX_VOLT_CLOSE;
 					
-	if(tempV>isPwmOn || gChargeCurrent_2 <3  )
+	if(tempV>isPwmOn /*|| gChargeCurrent_2 <3 */ )
 	{
 		StatusChange(batNum, STATE_BATTERY_TYPE_ERROR);
 		PwmControl(PWM_OFF);
