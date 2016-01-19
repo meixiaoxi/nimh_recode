@@ -228,8 +228,8 @@ typedef 	 unsigned long		u32;
 
 
 //factory test
- //   1.9 - 2.4A     700 -1000   20 /30       38mV~ 48mV    35mv~50mV 
-  //  600 - 1000     200 - 500	20/30    12mV~30mV      10mV~25mV		
+ //   1.9 - 2.4A     700 -1100   20 /30       38mV~ 48mV    35mv~55mV 
+  //  600 - 1000     150 - 550	20/30    12mV~30mV      8mV~28mV		
   // 100 - 600   50 -300               20/30        2mV~12mV     2mV ~15mV
 
 #define CURRENT_MAX_LEVEL_1		68			//48mV   48/3300*4096	
@@ -241,11 +241,11 @@ typedef 	 unsigned long		u32;
 #define CURRENT_MAX_LEVEL_3		14			//  12   12/3300*4096
 #define CURRENT_MIN_LEVEL_3		2			// 2		2/3300*4096
 
-#define CURRENT_MAX_LEVEL_1_AAA		62			//50mV   50/3300*4096	
+#define CURRENT_MAX_LEVEL_1_AAA		68			//55mV   55/3300*4096	
 #define CURRENT_MIN_LEVEL_1_AAA             43                    //35      35/3300*4096
 
-#define CURRENT_MAX_LEVEL_2_AAA		31			// 25mV   25/3300*4096
-#define CURRENT_MIN_LEVEL_2_AAA		12			// 10mV  10/3300*4096
+#define CURRENT_MAX_LEVEL_2_AAA		35			// 28mV   28/3300*4096
+#define CURRENT_MIN_LEVEL_2_AAA		9			// 8mV  8/3300*4096
 
 #define CURRENT_MAX_LEVEL_3_AAA		18			//  15   15/3300*4096
 #define CURRENT_MIN_LEVEL_3_AAA		2			// 2		2/3300*4096

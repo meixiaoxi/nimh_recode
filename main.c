@@ -1219,7 +1219,7 @@ void chargeHandler(void)
 								noCurrentCount[gIsChargingBatPos] = 0;
 						}
 
-						if(gErrorCount[gIsChargingBatPos] >=3 || noCurrentCount[gIsChargingBatPos] >=20)
+						if(gErrorCount[gIsChargingBatPos] >=3 || noCurrentCount[gIsChargingBatPos] >=10)
 						{
 							PwmControl(PWM_OFF);
 							StatusChange(gIsChargingBatPos,STATE_BATTERY_TYPE_ERROR);
@@ -1418,7 +1418,7 @@ do{
 
 	P0IO |= 0x04;  //set chg_dischg to output
 	P02 = 1;   //output 0 to lwo mos
-	delay_ms(1000);
+	//delay_ms(1000);
 
 
 	gBatVoltArray[0] = getAverage(CHANNEL_VIN_5V);
@@ -1648,13 +1648,13 @@ do{
 					break;
 				}
 				PwmControl(PWM_ON);
-				delay_ms(200);
+				delay_ms(100);
 				if(testlevel == 1)   //  1.9 - 2.4A     700 -1000   20 /30
 				{
 					if(gIsChargingBatPos == BT_4)
 					{
 						preVoltData[0] = 806;      // 0.65 0.65
-						preVoltData[1] = 1352;    // 1.09          1 + 1*90ohm
+						preVoltData[1] = 1477;    // 1.19          1.1 + 1.1*90ohm
 					}
 					else
 					{
