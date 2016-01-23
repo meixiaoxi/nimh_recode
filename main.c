@@ -1027,8 +1027,9 @@ void chargeHandler(void)
 					chargeCurrent = CURRENT_LEVEL_3;
 			if(gIsInTempProtect[gIsChargingBatPos])
 			{
-				if(chargeCurrent != CURRENT_LEVEL_3)
-					chargeCurrent++;
+				//if(chargeCurrent != CURRENT_LEVEL_3)
+					//chargeCurrent++;
+				chargeCurrent = CURRENT_LEVEL_3;
 			}
 			if(gChargeChildStatus[gIsChargingBatPos] == CHARGE_STATE_PRE)
 				chargeCurrent = CURRENT_LEVEL_3;
