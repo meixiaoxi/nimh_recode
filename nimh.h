@@ -118,7 +118,7 @@ typedef 	 unsigned long		u32;
 #define BAT_MIN_VOLT_OPEN	372 			//(0.3/3.3)*4096
 #define BAT_MAX_VOLT_OPEN	1923		//(1.55/3.3)*4096
 
-#define BAT_MIN_VOLT_OPEN_SPE	372 			//(0.3/3.3)*4096
+#define BAT_MIN_VOLT_OPEN_SPE	124 			//(0.1/3.3)*4096
 
 #define BAT_MAX_VOLT_CLOSE 2445		//(1.97/3.3*4096)        (1.8/3.3)*4096	
 #define BAT_MAX_VOLT_CLOSE_CHANNEL_4		2234	//(1.8/3.3)*4096
