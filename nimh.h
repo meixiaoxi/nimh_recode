@@ -228,27 +228,27 @@ typedef 	 unsigned long		u32;
 
 
 //factory test
- //   1.9 - 2.4A     700 -1100   20 /30       38mV~ 48mV    35mv~55mV 
-  //  600 - 1000     150 - 550	20/30    12mV~30mV      8mV~28mV		
-  // 100 - 600   50 -300               20/30        2mV~12mV     2mV ~15mV
+ //   1.8 - 2.5A     700 -1100   20 /30       36mV~ 50mV    35mv~55mV 
+  //  600 - 1200     150 - 550	20/30    12mV~24mV      7mV~28mV		
+  // 100 - 650   50 -300               20/30        2mV~13mV     2mV ~15mV
 
-#define CURRENT_MAX_LEVEL_1		68			//48mV   48/3300*4096	
-#define CURRENT_MIN_LEVEL_1             47                    //38      38/3300*4096
+#define CURRENT_MAX_LEVEL_1		67			//50mV   50/3300*4096	
+#define CURRENT_MIN_LEVEL_1             44                    //36      36/3300*4096
 
-#define CURRENT_MAX_LEVEL_2		37			// 30mV   30/3300*4096
-#define CURRENT_MIN_LEVEL_2		14			// 12mV  12/3300*4096
+#define CURRENT_MAX_LEVEL_2		34			// 24mV   24/3300*4096
+#define CURRENT_MIN_LEVEL_2		12			// 12mV  12/3300*4096
 
-#define CURRENT_MAX_LEVEL_3		14			//  12   12/3300*4096
+#define CURRENT_MAX_LEVEL_3		20			//  13   13/3300*4096
 #define CURRENT_MIN_LEVEL_3		2			// 2		2/3300*4096
 
-#define CURRENT_MAX_LEVEL_1_AAA		68			//55mV   55/3300*4096	
-#define CURRENT_MIN_LEVEL_1_AAA             43                    //35      35/3300*4096
+#define CURRENT_MAX_LEVEL_1_AAA		70			//55mV   55/3300*4096	
+#define CURRENT_MIN_LEVEL_1_AAA             40                    //35      35/3300*4096
 
-#define CURRENT_MAX_LEVEL_2_AAA		35			// 28mV   28/3300*4096
-#define CURRENT_MIN_LEVEL_2_AAA		9			// 8mV  8/3300*4096
+#define CURRENT_MAX_LEVEL_2_AAA		38			// 28mV   28/3300*4096
+#define CURRENT_MIN_LEVEL_2_AAA		6			// 7mV  8/3300*4096
 
-#define CURRENT_MAX_LEVEL_3_AAA		18			//  15   15/3300*4096
-#define CURRENT_MIN_LEVEL_3_AAA		2			// 2		2/3300*4096
+#define CURRENT_MAX_LEVEL_3_AAA		20			//  15   15/3300*4096
+#define CURRENT_MIN_LEVEL_3_AAA		1			// 2		2/3300*4096
 
 #elif (LDO_LEVEL == 4000)
 #warning "4v ldo"

@@ -1660,7 +1660,7 @@ do{
 					else
 					{
 						preVoltData[0] = 2358;    // 1.9V   1.9+ 1.9*90ohm
-						preVoltData[1] = 3351;    //   2.7 2.616V  2.4 + 2.4*90ohm
+						preVoltData[1] = 3382;    //   2.7 2.616V  2.5 + 2.5*90ohm
 					}
 					gBatVoltArray[gIsChargingBatPos] = getVbatAdc(gIsChargingBatPos);
 					if(gBatVoltArray[gIsChargingBatPos] >preVoltData[1] || gBatVoltArray[gIsChargingBatPos] < preVoltData[0] )  // µç³ØÍ¨µÀADC
