@@ -58,7 +58,10 @@ u8 tryUpDnCurrent[2] = {UP_CURRENT,UP_CURRENT};
 u8 tryCount =0;
 u8 noCurrentCount[4] = {0,0,0,0};
 u16 idata gDnCurrentTick[2] = {0,0};
-
+u8 idata gOutBatTempErrorCnt = 0;
+u8 idata gBatLowCnt = 0;
+u8 idata gOutOpenOk = 0;
+u8 idata no_battery = 0;
 extern u8 ledDisplayCount;
 extern u8 gLedStatus;
 void FindTwoBattery()
@@ -164,7 +167,8 @@ void outputHandler()
 {
 	u8 cur_detect_pos,isVbatOk = 1;
 	u16 temp_min;
-	u8 no_battery = 0;
+
+	no_battery = 0;
 do
 {
 	//if(gOutputStatus != OUTPUT_STATUS_STOP)
@@ -273,7 +277,8 @@ do
 				else if(gOutputStatus == OUTPUT_STATUS_NORMAL)
 					isVbatOk = 0;
 				LED_OFF(BT_1);LED_OFF(BT_2);LED_OFF(BT_3);LED_OFF(BT_4);
-				gBatStateBuf[0] = 0;
+				if(gOutputStatus != OUTPUT_STATUS_NORMAL)
+					gBatStateBuf[0] = 0;
 				no_battery = 1;
 			}
 
@@ -406,6 +411,9 @@ do
 				{
 					if(gOutputStatus == OUTPUT_STATUS_WAIT)
 					{
+						gOutOpenOk++;
+						if(gOutOpenOk < 4)
+							return;
 						gOutputStatus = OUTPUT_STATUS_NORMAL;
 						gBatStateBuf[0] = 0;
 						gBatStateBuf[1] = 0;
@@ -417,6 +425,8 @@ do
 						//updateBatLevel(gBatVoltArray[1][0],gCount+1);
 					}
 					gChargingTimeTick[0]++;
+					gBatLowCnt = 0;
+					gOutBatTempErrorCnt = 0;
 				}
 				else
 				{
@@ -430,6 +440,41 @@ do
 						}
 					}
 					#endif
+					if(no_battery == 1)
+					{
+						if(gOutputStatus == OUTPUT_STATUS_NORMAL)
+						{
+							temp_min = getAverage(CHANNEL_VIN_5V);
+							if(temp_min > VIN_5V_NO_EXIST)
+								gOutBatTempErrorCnt = 60;
+						}
+					}
+					if(skipCount == 1)
+					{
+						gOutBatTempErrorCnt++;
+					}
+					if(isVbatOk == 0)
+					{
+						if(no_battery == 1)
+							gBatLowCnt += 4;
+						else
+							gBatLowCnt++;
+						gOutOpenOk = 0;
+					}
+					
+
+					if(gOutBatTempErrorCnt < 60 && gBatLowCnt < 60)
+					{
+						temp_min = getAverage(CHANNEL_VIN_5V);
+						if(temp_min > VIN_5V_NO_EXIST)
+						{
+							LED_OFF(BT_1),LED_OFF(BT_2),LED_OFF(BT_3),LED_OFF(BT_4);
+						}
+						return;
+					}
+
+					gBatLowCnt = 0;
+					gOutBatTempErrorCnt = 0;
 					
 					if(gOutputStatus == OUTPUT_STATUS_NORMAL || no_battery == 0)
 					{
@@ -583,6 +628,9 @@ void StatusCheck()
 					skipCount = 0;
 					gHasBat = 0;
 					gChargeCount = 0;
+					gBatLowCnt = 0;
+					gOutBatTempErrorCnt = 0;
+					gOutOpenOk = 0;
 				}
 			}
 			else
