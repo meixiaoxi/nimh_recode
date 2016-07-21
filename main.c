@@ -1045,8 +1045,8 @@ void chargeHandler(void)
 	u16 tempT,tempV,temp_2;
 	u8 battery_state = gBatStateBuf[gIsChargingBatPos];
 	static u8 chargingTime = 0;
-
-	u8 chargeCurrent = 0,temp_3;
+	static u8 chargeCurrent = 0;
+	u8 temp_3;
 
 	if(gChargingStatus == SYS_CHARGE_WAIT_TO_PICK_BATTERY)
 	{
@@ -1127,7 +1127,10 @@ void chargeHandler(void)
 			}
 			isPwmOn = 1;
 			#ifdef DVT_BOARD
-			setCurrent(chargeCurrent);
+			if(chargeCurrent < CURRENT_LEVEL_3 && battery_state == STATE_NORMAL_CHARGING)
+				setCurrent(CURRENT_LEVEL_3);
+			else
+				setCurrent(chargeCurrent);
 			#endif
 			PwmControl(PWM_ON);
 			gChargingStatus = SYS_CHARGE_IS_CHARGING;
@@ -1157,6 +1160,10 @@ void chargeHandler(void)
 		if(chargingTime != 0)
 		{
 			gChargeCount++;
+			if(gChargeCount == 1)
+			{
+				setCurrent(chargeCurrent);
+			}
 			if(gChargeCount >= chargingTime)  //充电时间到
 			{
 				if(battery_state == STATE_DEAD_BATTERY)
