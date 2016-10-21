@@ -72,6 +72,7 @@ typedef 	 unsigned long		u32;
 #define CURRENT_LEVEL_1		1
 #define CURRENT_LEVEL_2		2
 #define CURRENT_LEVEL_3		3
+//#define CURRENT_LEVEL_4		4
 
 //#define SYS_CHARGING_STATUS_DETECT	0
 //#define SYS_CHARGING_STATUS_NORMAL	1

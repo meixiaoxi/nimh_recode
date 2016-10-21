@@ -992,6 +992,14 @@ void setCurrent(u8 level)
 		P3IO |= 0x40;
 		P36 = 0;
 	}
+/*	else if(level == CURRENT_LEVEL_4)
+	{
+		P3IO |= 0x04;  //cur_ctl输出
+		P3IO |= 0x40;
+
+		P32 = 0;
+		P36 = 0;
+	}*/
 	gCurrentNow = level;
 }
 
@@ -1053,7 +1061,7 @@ void chargeHandler(void)
 		if(battery_state == STATE_DEAD_BATTERY)
 		{
 			chargingTime = CHARGING_TIME_10MS;
-			chargeCurrent = CURRENT_LEVEL_2;
+			chargeCurrent = CURRENT_LEVEL_3;
 		}
 		else if(battery_state == STATE_BATTERY_DETECT)
 		{
@@ -1127,7 +1135,7 @@ void chargeHandler(void)
 			}
 			isPwmOn = 1;
 			#ifdef DVT_BOARD
-			if(chargeCurrent < CURRENT_LEVEL_3 && battery_state == STATE_NORMAL_CHARGING)
+			if(chargeCurrent < CURRENT_LEVEL_3 && battery_state != STATE_DEAD_BATTERY)
 				setCurrent(CURRENT_LEVEL_3);
 			else
 				setCurrent(chargeCurrent);
@@ -1160,9 +1168,10 @@ void chargeHandler(void)
 		if(chargingTime != 0)
 		{
 			gChargeCount++;
-			if(gChargeCount == 1)
+			if(gCurrentNow > chargeCurrent)
 			{
-				setCurrent(chargeCurrent);
+				gCurrentNow--;
+				setCurrent(gCurrentNow);
 			}
 			if(gChargeCount >= chargingTime)  //充电时间到
 			{
