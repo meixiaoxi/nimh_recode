@@ -10,7 +10,7 @@ typedef 	 unsigned long		u32;
 //#define EVT_BOARD
 #define DVT_BOARD
 
-#define GET_FACTORY_STATUS()	(P2&0x20)
+#define GET_FACTORY_STATUS()	(P2&0x20) == 0
 
 #define		cli()		do{IE &= ~0x80;}while(0)
 #define		sei()		do{IE |=  0x80;}while(0)
@@ -32,13 +32,12 @@ typedef 	 unsigned long		u32;
 #define SYS_DISCHARGE_STATE	0x01
 #else
 #warning "dvt version"
-#define		GET_SYS_STATUS()	P0&0x04
+#define SYS_CHARGING_STATE	0x00
+#define SYS_DISCHARGE_STATE	0x04
+#define		GET_SYS_STATUS()	SYS_CHARGING_STATE
 
 #define		CHANGE_TO_OUTPUT()	NOP() //(P2IO |= (1<<4),P24 = 0)
 #define		CHANGE_TO_INPUT()		NOP() //(P2IO &=~(1<<4))
-
-#define SYS_CHARGING_STATE	0x00
-#define SYS_DISCHARGE_STATE	0x04
 #endif
 
 #define toNextBattery()	if(gIsChargingBatPos >= BT_4)\
@@ -121,13 +120,13 @@ typedef 	 unsigned long		u32;
 
 #define BAT_MIN_VOLT_OPEN_SPE	124 			//(0.1/3.3)*4096
 
-#define BAT_MAX_VOLT_CLOSE 2445		//(1.97/3.3*4096)        (1.8/3.3)*4096	
+#define BAT_MAX_VOLT_CLOSE 2234		//(1.97/3.3*4096)        (1.8/3.3)*4096	
 #define BAT_MAX_VOLT_CLOSE_CHANNEL_4		2234	//(1.8/3.3)*4096
 
-#define BAT_MAX_CLOS_LEVEL_2		2142				//(1.65+0.076)  (1.726/3.3*4096)
+#define BAT_MAX_CLOS_LEVEL_2		2048				//(1.65+0.076)  (1.726/3.3*4096)
 #define BAT_MAX_CLOSE_CHANNEL_4_LEVEL_2	 2048		// (1.65   1.65/3.3)*4096
 
-#define BAT_MAX_CLOS_LEVEL_3			1990						// 1.57 + 0.034
+#define BAT_MAX_CLOS_LEVEL_3			1948						// 1.57 + 0.034
 #define BAT_MAX_CLOSE_CHANNEL_4_LEVEL_3	1948				// 1.57  1.57/3.3*4096
 
 #define BAT_LEVEL_LOW_TO_MIDD		1737			// 1.4     (1.4/3.3)*4096
