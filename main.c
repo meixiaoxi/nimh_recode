@@ -797,11 +797,13 @@ void FastCharge(u8 batNum)
 {
 	u16 tempV,tempT;
 	u32 overTimer = BAT_CHARGING_FAST_MAX_COUNT;
+	u32 idata gFuckTick;
 	
 	tempV = getVbatAdc(batNum);
 
 	if(gBatType[batNum] != BAT_AAA_TYPE)
 	{
+	gFuckTick = BAT_NEAR_FULL_MAX_COUNT;
 	if(gPreCurrent== CURRENT_LEVEL_1)	
 	{
 		gChargingTimeTick[batNum]++;
@@ -845,6 +847,7 @@ void FastCharge(u8 batNum)
 	}
 	else
 	{
+	gFuckTick = BAT_NEAR_FULL_MAX_COUNT_AAA;
 	if(gPreCurrent== CURRENT_LEVEL_1)	
 	{
 		gChargingTimeTick[batNum]++;
@@ -908,8 +911,8 @@ void FastCharge(u8 batNum)
 					gIsInTempProtect[batNum] = 0;
 					
 			 }
-			
-			if(gChargingTimeTick[batNum] > overTimer || gNearFullTimeTick[batNum] > BAT_NEAR_FULL_MAX_COUNT)
+
+			if(gChargingTimeTick[batNum] > overTimer || gNearFullTimeTick[batNum] > gFuckTick)
 			{
 					StatusChange(batNum,STATE_BATTERY_FULL);	
 					gChargingTimeTick[batNum] = 0;
@@ -1088,6 +1091,10 @@ void chargeHandler(void)
 				//if(chargeCurrent != CURRENT_LEVEL_3)
 					//chargeCurrent++;
 				chargeCurrent = CURRENT_LEVEL_3;
+			}
+			else if(gNearFullTimeTick[gIsChargingBatPos] >= 50)
+			{
+				chargeCurrent = CURRENT_LEVEL_2;
 			}
 			if(gChargeChildStatus[gIsChargingBatPos] == CHARGE_STATE_PRE)
 				chargeCurrent = CURRENT_LEVEL_3;
