@@ -1092,7 +1092,7 @@ void chargeHandler(void)
 					//chargeCurrent++;
 				chargeCurrent = CURRENT_LEVEL_3;
 			}
-			else if(gNearFullTimeTick[gIsChargingBatPos] >= 50)
+			else if((gNearFullTimeTick[gIsChargingBatPos] >= 50) && (gBatType[gIsChargingBatPos] == BAT_AAA_TYPE))
 			{
 				chargeCurrent = CURRENT_LEVEL_2;
 			}
