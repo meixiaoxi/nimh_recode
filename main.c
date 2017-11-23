@@ -1435,7 +1435,7 @@ void PickBattery()
 						if((gNowTwoBuf[0] != gIsChargingBatPos) && (gNowTwoBuf[1] != gIsChargingBatPos))
 							continue;
 					}
-					if(RestTime[gIsChargingBatPos] >= 18)
+					if(RestTime[gIsChargingBatPos] >= 20)
 					{
 						RestTime[gIsChargingBatPos] = 0;
 						break;
@@ -1492,6 +1492,7 @@ void btRemove()
 
 
 //π§≥ß≤‚ ‘
+#if 0
 void factoryTest()
 {
 	u8 testlevel = 1;
@@ -1726,7 +1727,7 @@ do{
 	}
 		
 }
-
+#endif
 void InitConfig()
 {
 
@@ -1834,15 +1835,19 @@ void main()
 
 	isFromOutput = 0;
 
-	if(GET_FACTORY_STATUS())
+
+/*	if(GET_FACTORY_STATUS())
 	{
 		factoryTest();
 	}
+
 	else
+		*/
 	{
 		P2IO |= (1<<5);
 		P2PU &= (~(1<<5));
 	}
+	
 	gSysStatus =  GET_SYS_STATUS();
 	if(gSysStatus == SYS_DISCHARGE_STATE)
 	{
@@ -1853,6 +1858,24 @@ void main()
 		EIPOL0L = 0x06;   // interrupt EINT0 on falling edge	EINT1 on rising edge
 	}
 	delay_ms(100);
+
+gIsChargingBatPos = BT_1;
+PwmControl(PWM_ON);
+
+isFromOutput = 1;
+
+while(1)
+{
+	if(isFromOutput == 99)
+		break;
+
+	setCurrent(isFromOutput);
+	delay_ms(3000);
+	if(isFromOutput > CURRENT_LEVEL_3)
+		isFromOutput = CURRENT_LEVEL_1;
+	else
+		isFromOutput++;
+}
 
 	while(1)
 	{
