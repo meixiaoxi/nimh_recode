@@ -1492,7 +1492,7 @@ void btRemove()
 
 
 //π§≥ß≤‚ ‘
-#if 0
+#if 1
 void factoryTest()
 {
 	u8 testlevel = 1;
@@ -1836,13 +1836,11 @@ void main()
 	isFromOutput = 0;
 
 
-/*	if(GET_FACTORY_STATUS())
+	if(GET_FACTORY_STATUS())
 	{
 		factoryTest();
 	}
-
 	else
-		*/
 	{
 		P2IO |= (1<<5);
 		P2PU &= (~(1<<5));
@@ -1859,6 +1857,7 @@ void main()
 	}
 	delay_ms(100);
 
+/*
 gIsChargingBatPos = BT_1;
 PwmControl(PWM_ON);
 
@@ -1876,7 +1875,7 @@ while(1)
 	else
 		isFromOutput++;
 }
-
+*/
 	while(1)
 	{
 		shortTick =0;
